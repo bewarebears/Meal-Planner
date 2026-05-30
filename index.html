@@ -736,6 +736,13 @@ async function callClaudeForRecipe(contentBlocks) {
   document.getElementById('import-result').style.display = 'none';
   parsedImport = null;
 
+  if (!state.apiKey) {
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-result').style.display = 'block';
+    document.getElementById('import-result').innerHTML = `<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ No API key set. Go to <strong>Settings → Claude API Key</strong> and add your key first.</div>`;
+    return;
+  }
+
   const prompt = `You are a recipe parser. Extract the recipe from the provided text or image and return ONLY valid JSON with no markdown, no preamble, no backticks. Use this exact shape:
 {
   "name": "Recipe Name",
@@ -752,7 +759,7 @@ If no clear recipe is found, return {"error": "No recipe found"}.`;
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -762,6 +769,7 @@ If no clear recipe is found, return {"error": "No recipe found"}.`;
     });
 
     const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
     const raw = (data.content || []).map(b => b.text || '').join('').trim();
     const clean = raw.replace(/^```json|^```|```$/gm,'').trim();
     const parsed = JSON.parse(clean);
@@ -787,7 +795,7 @@ If no clear recipe is found, return {"error": "No recipe found"}.`;
   } catch (err) {
     document.getElementById('import-loading').style.display = 'none';
     document.getElementById('import-result').style.display = 'block';
-    document.getElementById('import-result').innerHTML = `<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ Something went wrong. Please try again.</div>`;
+    document.getElementById('import-result').innerHTML = `<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ ${err.message || 'Something went wrong. Check your API key in Settings.'}</div>`;
   }
 }
 
@@ -951,12 +959,42 @@ function renderSettings() {
     </div>
 
     <div class="settings-section">
-      <h3>⚠️ Reset Data</h3>
+      <h3>🤖 Claude API Key</h3>
+      <p>Required for the Instagram recipe import feature. Your key is stored only on this device and never shared.</p>
+      <ol>
+        <li>Go to <strong>console.anthropic.com</strong> and sign up free</li>
+        <li>Click <strong>API Keys</strong> and create a new key</li>
+        <li>Paste it below and tap Save</li>
+      </ol>
+      <label style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">API Key</label>
+      <div class="sync-url-row">
+        <input type="password" id="api-key-input" placeholder="sk-ant-…" value="${state.apiKey || ''}">
+        <button class="connect-btn" onclick="saveApiKey()">Save</button>
+      </div>
+      <div id="api-key-status" class="status-box ${state.apiKey ? 'ok' : ''}" style="${state.apiKey ? 'display:block' : 'display:none'}">${state.apiKey ? '✅ API key saved — Instagram import is enabled' : ''}</div>
+    </div>
+
+    <div class="settings-section">
       <p>Clear all local data on this device. This won't affect your partner's data or the Google Sheet.</p>
       <button onclick="resetData()" style="background:none;border:1.5px solid #e57373;color:#c62828;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Reset this device</button>
     </div>`;
 
   document.getElementById('view-settings').innerHTML = html;
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    const box = document.getElementById('api-key-status');
+    box.className = 'status-box err'; box.style.display = 'block';
+    box.textContent = '⚠️ That doesn\'t look right — the key should start with sk-ant-';
+    return;
+  }
+  state.apiKey = key;
+  try { localStorage.setItem('deux-semaines-v1', JSON.stringify(state)); } catch {}
+  const box = document.getElementById('api-key-status');
+  box.className = 'status-box ok'; box.style.display = 'block';
+  box.textContent = '✅ API key saved — Instagram import is enabled';
 }
 
 function resetData() {
