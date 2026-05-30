@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2c2416" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Deux Semaines" />
+  <title>Deux Semaines</title>
+
+  <!-- Inline PWA manifest -->
+  <script>
+    const manifest = {
+      name: "Deux Semaines",
+      short_name: "Meal Plan",
+      description: "Two-week meal rotation planner",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#faf8f3",
+      theme_color: "#2c2416",
+      orientation: "portrait-primary",
+      icons: [
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232c2416'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E🍽%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%232c2416'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle'%3E🍽%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    document.write('<link rel="manifest" href="' + manifestURL + '">');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #faf8f3;
+      --ink: #2c2416;
+      --ink2: #4a3a28;
+      --muted: #7a6a52;
+      --faint: #9a8060;
+      --border: #e0d8cc;
+      --surface: #ffffff;
+      --warm: #f0ece4;
+      --accent: #c9b99a;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--ink);
+      color: var(--bg);
+      padding: calc(12px + var(--safe-top)) 20px 12px;
+      flex-shrink: 0;
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 11px; color: var(--accent); font-style: italic; margin-left: 8px; }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .sync-dot.ok { background: #81c784; }
+    .sync-dot.err { background: #e57373; }
+    .sync-dot.off { background: #888; }
+    .sync-dot.syncing { background: #ffb74d; animation: pulse .8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .settings-btn { background: none; border: none; color: var(--accent); font-size: 20px; cursor: pointer; padding: 2px; line-height: 1; }
+
+    /* ── BOTTOM NAV ── */
+    nav {
+      background: var(--ink);
+      display: flex;
+      padding: 8px 0 calc(8px + var(--safe-bottom));
+      flex-shrink: 0;
+      border-top: 1px solid #3d3020;
+    }
+    nav button {
+      flex: 1; background: none; border: none; color: var(--accent);
+      font-family: 'Source Serif 4', serif; font-size: 11px; font-weight: 400;
+      padding: 6px 4px; cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; gap: 3px; transition: color .15s; letter-spacing: .04em;
+    }
+    nav button.active { color: var(--bg); font-weight: 600; }
+    nav button span.icon { font-size: 20px; line-height: 1; }
+
+    /* ── SCROLLABLE CONTENT ── */
+    .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .page { padding: 16px 16px 24px; }
+
+    /* ── WEEK TABS ── */
+    .week-tabs { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .week-tab {
+      background: var(--warm); border: none; border-radius: 20px; padding: 6px 16px;
+      font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+      color: var(--ink); transition: all .15s;
+    }
+    .week-tab.active { background: var(--ink); color: var(--bg); }
+    .week-hint { font-size: 12px; color: var(--faint); font-style: italic; margin-left: auto; }
+
+    /* ── PLANNER VERTICAL LAYOUT ── */
+    .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+    .day-header { background: var(--ink); color: var(--bg); padding: 10px 14px; display: flex; align-items: baseline; gap: 8px; }
+    .day-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+    .day-date { font-size: 11px; color: var(--accent); font-style: italic; }
+
+    .meal-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--warm); }
+    .meal-row:last-child { border-bottom: none; }
+    .meal-tag { width: 84px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink2); padding: 10px 8px; }
+    .meal-tag.breakfast { background: #fff8e1; }
+    .meal-tag.lunch     { background: #e0f2f1; }
+    .meal-tag.dinner    { background: #ede7f6; }
+
+    .meal-cell { flex: 1; padding: 10px 12px; cursor: pointer; position: relative; min-height: 52px; display: flex; align-items: center; transition: background .1s; }
+    .meal-cell:active { background: var(--warm); }
+    .meal-cell.filled { background: #fdfcf9; }
+    .meal-cell-inner { flex: 1; }
+    .cell-empty { color: #ccc; font-size: 12px; }
+    .cell-name { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; margin-bottom: 3px; }
+    .cell-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+    .tag-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .cell-clear { background: none; border: none; cursor: pointer; font-size: 14px; color: #ccc; padding: 4px 6px; flex-shrink: 0; line-height: 1; }
+
+    /* ── RECIPE CARDS ── */
+    .recipe-grid { display: flex; flex-direction: column; gap: 10px; }
+    .recipe-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .recipe-card-top { padding: 12px 14px 10px; border-bottom: 1px solid var(--warm); }
+    .recipe-card-title { font-size: 15px; font-weight: 700; display: flex; justify-content: space-between; align-items: flex-start; }
+    .recipe-card-body { padding: 10px 14px; }
+    .recipe-ing { font-size: 13px; color: var(--ink2); margin-bottom: 2px; }
+    .recipe-ing .qty { color: var(--faint); font-weight: 600; }
+    .recipe-more { font-size: 12px; color: var(--faint); font-style: italic; }
+
+    /* ── TAG CHIPS ── */
+    .tags-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-btn { border-radius: 20px; border: none; padding: 5px 12px; cursor: pointer; font-size: 12px; font-family: inherit; white-space: nowrap; transition: all .12s; background: var(--warm); color: var(--ink); font-weight: 400; }
+    .filter-btn.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+
+    /* ── SHOPPING ── */
+    .shop-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .shop-item.checked { opacity: .45; }
+    .shop-item input[type=checkbox] { margin-top: 3px; accent-color: var(--ink); width: 17px; height: 17px; flex-shrink: 0; cursor: pointer; }
+    .shop-name { font-size: 14px; font-weight: 600; }
+    .shop-meta { font-size: 12px; color: var(--faint); margin-top: 2px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(44,36,22,.55);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 300; padding: 0;
+    }
+    .modal-sheet {
+      background: var(--bg); border-radius: 18px 18px 0 0; width: 100%; max-width: 600px;
+      max-height: 82dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 0 0 calc(16px + var(--safe-bottom));
+      animation: slideUp .22s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 4px; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px 14px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+    .modal-close { background: none; border: 1px solid var(--border); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; font-size: 15px; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+    .modal-body { padding: 0 20px; }
+
+    /* ── FORMS ── */
+    label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--ink2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; margin-top: 14px; }
+    input[type=text], textarea {
+      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: inherit; background: var(--surface); color: var(--ink);
+      outline: none; transition: border-color .12s;
+    }
+    input[type=text]:focus, textarea:focus { border-color: var(--ink); }
+    textarea { height: 80px; resize: vertical; }
+    .ing-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .ing-row input:first-child { flex: 3; }
+    .ing-row input:last-child { flex: 1; }
+    .add-ing-btn { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; font-family: inherit; padding: 2px 0; }
+    .save-btn { width: 100%; padding: 13px; background: var(--ink); color: var(--bg); border: none; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; margin-top: 18px; }
+    .fab { position: fixed; bottom: calc(76px + var(--safe-bottom)); right: 20px; background: var(--ink); color: var(--bg); border: none; border-radius: 50%; width: 52px; height: 52px; font-size: 26px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.22); display: flex; align-items: center; justify-content: center; z-index: 50; }
+
+    /* ── RECIPE DETAIL ── */
+    .detail-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--warm); font-size: 14px; }
+    .detail-qty { color: var(--faint); font-weight: 600; }
+    .method-text { font-size: 14px; line-height: 1.75; color: var(--ink2); margin-top: 4px; }
+
+    /* ── ASSIGN LIST ── */
+    .assign-btn {
+      display: block; width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 9px; padding: 11px 14px; text-align: left; cursor: pointer;
+      font-family: inherit; margin-bottom: 8px; transition: border-color .12s;
+    }
+    .assign-btn:active { border-color: var(--ink); background: var(--warm); }
+    .assign-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--faint); font-style: italic; font-size: 15px; }
+
+    /* ── SETTINGS ── */
+    .settings-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .settings-section h3 { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .settings-section p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .settings-section ol { font-size: 13px; color: var(--muted); line-height: 1.8; padding-left: 18px; margin-bottom: 14px; }
+    .settings-section ol li { margin-bottom: 2px; }
+    .settings-section code { background: var(--warm); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--ink); font-family: monospace; }
+    .sync-url-row { display: flex; gap: 8px; }
+    .sync-url-row input { flex: 1; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--surface); color: var(--ink); outline: none; }
+    .sync-url-row input:focus { border-color: var(--ink); }
+    .connect-btn { background: var(--ink); color: var(--bg); border: none; border-radius: 8px; padding: 10px 16px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .sync-now-btn { width: 100%; padding: 11px; background: #3d6b38; color: #fff; border: none; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .sync-now-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .status-box { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 10px; display: none; }
+    .status-box.ok  { background: #f0f7ee; border: 1px solid #b8ddb4; color: #2a4a26; }
+    .status-box.err { background: #fdf0f0; border: 1px solid #e0b0b0; color: #6b2a2a; }
+    .script-code { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 14px; font-family: monospace; font-size: 11px; line-height: 1.6; overflow-x: auto; white-space: pre; margin-bottom: 10px; }
+    .copy-code-btn { background: var(--warm); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--ink); }
+
+    /* ── IMPORT FROM INSTAGRAM ── */
+    .import-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .import-tab { flex: 1; padding: 10px 8px; background: none; border: none; border-bottom: 2px solid transparent; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s; margin-bottom: -1px; }
+    .import-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+    .import-panel { display: none; }
+    .import-panel.active { display: block; }
+    .upload-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 28px 16px; text-align: center; cursor: pointer; transition: border-color .15s; background: var(--warm); }
+    .upload-zone:active { border-color: var(--ink); }
+    .upload-zone .icon { font-size: 36px; margin-bottom: 8px; }
+    .upload-zone p { font-size: 13px; color: var(--muted); }
+    .upload-preview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
+    .ai-loading { display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--warm); border-radius: 8px; font-size: 13px; color: var(--muted); font-style: italic; }
+    .ai-loading .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ai-result { background: #f0f7ee; border: 1px solid #b8ddb4; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; color: #2a4a26; }
+    .import-btn { width: 100%; padding: 12px; background: #3d6b38; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; margin-top: 4px; }
+    .import-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* install banner */
+    #install-banner { display: none; position: fixed; bottom: calc(72px + var(--safe-bottom)); left: 12px; right: 12px; background: var(--ink); color: var(--bg); border-radius: 12px; padding: 14px 16px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+    #install-banner p { font-size: 13px; margin-bottom: 10px; line-height: 1.5; }
+    #install-banner .banner-btns { display: flex; gap: 8px; }
+    #install-banner button { flex: 1; padding: 9px; border-radius: 8px; border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+    #install-btn { background: var(--accent); color: var(--ink); }
+    #dismiss-btn { background: #3d3020; color: var(--bg); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <span class="logo">Deux Semaines</span>
+      <span class="logo-sub">meal planner</span>
+    </div>
+    <div class="header-right">
+      <span id="sync-status" style="font-size:11px;color:var(--accent);display:flex;align-items:center;cursor:pointer" onclick="showView('settings')">
+        <span class="sync-dot off" id="sync-dot"></span><span id="sync-label">not synced</span>
+      </span>
+      <button class="settings-btn" onclick="showView('settings')" title="Settings">⚙️</button>
+    </div>
+  </div>
+</header>
+
+<div class="content" id="content">
+  <div id="view-planner" class="page"></div>
+  <div id="view-recipes" class="page" style="display:none"></div>
+  <div id="view-shopping" class="page" style="display:none"></div>
+  <div id="view-settings" class="page" style="display:none"></div>
+</div>
+
+<nav>
+  <button class="active" onclick="showView('planner')" id="nav-planner">
+    <span class="icon">📅</span>Planner
+  </button>
+  <button onclick="showView('recipes')" id="nav-recipes">
+    <span class="icon">🍳</span>Recipes
+  </button>
+  <button onclick="showView('shopping')" id="nav-shopping">
+    <span class="icon">🛒</span>Shopping
+  </button>
+  <button onclick="showView('settings')" id="nav-settings">
+    <span class="icon">⚙️</span>Settings
+  </button>
+</nav>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Install banner -->
+<div id="install-banner">
+  <p>📲 Add <strong>Deux Semaines</strong> to your home screen for quick access!</p>
+  <div class="banner-btns">
+    <button id="install-btn" onclick="installApp()">Add to Home Screen</button>
+    <button id="dismiss-btn" onclick="dismissBanner()">Not now</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const DAYS_SHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DAYS_FULL  = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const MEALS = ["Breakfast","Lunch","Dinner"];
+const MEAL_BG = { Breakfast:"#fff8e1", Lunch:"#e0f2f1", Dinner:"#ede7f6" };
+const TAG_COLORS = {
+  breakfast:"#f9d85e", lunch:"#6fcfc8", dinner:"#9fa8da",
+  quick:"#a5d6a7", vegetarian:"#c5e1a5", vegan:"#80cbc4",
+  protein:"#ef9a9a", healthy:"#80deea", "prep-ahead":"#ce93d8"
+};
+
+const DEFAULT_RECIPES = [
+  { id:1, name:"Avocado Toast", tags:["breakfast","quick"], ingredients:[{item:"Sourdough bread",qty:"2 slices"},{item:"Avocado",qty:"1"},{item:"Lemon",qty:"½"},{item:"Chilli flakes",qty:"pinch"},{item:"Sea salt",qty:"pinch"}], instructions:"Toast bread, mash avocado with lemon and salt, spread and top with chilli flakes." },
+  { id:2, name:"Pasta Primavera", tags:["dinner","vegetarian"], ingredients:[{item:"Pasta",qty:"300g"},{item:"Zucchini",qty:"1"},{item:"Cherry tomatoes",qty:"150g"},{item:"Parmesan",qty:"50g"},{item:"Olive oil",qty:"2 tbsp"},{item:"Garlic",qty:"3 cloves"}], instructions:"Cook pasta. Sauté garlic and veg in olive oil 5 mins. Toss with pasta and parmesan." },
+  { id:3, name:"Greek Salad", tags:["lunch","quick","vegetarian"], ingredients:[{item:"Cucumber",qty:"1"},{item:"Tomatoes",qty:"3"},{item:"Feta",qty:"100g"},{item:"Olives",qty:"50g"},{item:"Red onion",qty:"½"},{item:"Olive oil",qty:"3 tbsp"}], instructions:"Chop all veg, combine with olives and feta, dress with olive oil and oregano." },
+  { id:4, name:"Chicken Stir-Fry", tags:["dinner","protein"], ingredients:[{item:"Chicken breast",qty:"400g"},{item:"Bell peppers",qty:"2"},{item:"Broccoli",qty:"200g"},{item:"Soy sauce",qty:"3 tbsp"},{item:"Sesame oil",qty:"1 tbsp"},{item:"Rice",qty:"300g"}], instructions:"Cook rice. Stir-fry chicken until golden, add veg and sauce, cook 5 mins more." },
+  { id:5, name:"Overnight Oats", tags:["breakfast","prep-ahead"], ingredients:[{item:"Rolled oats",qty:"80g"},{item:"Milk",qty:"200ml"},{item:"Honey",qty:"1 tbsp"},{item:"Chia seeds",qty:"1 tbsp"},{item:"Berries",qty:"handful"}], instructions:"Mix oats, milk, honey and chia. Refrigerate overnight. Top with berries to serve." },
+  { id:6, name:"Lentil Soup", tags:["lunch","dinner","vegan"], ingredients:[{item:"Red lentils",qty:"250g"},{item:"Onion",qty:"1"},{item:"Carrots",qty:"2"},{item:"Canned tomatoes",qty:"400g"},{item:"Cumin",qty:"1 tsp"},{item:"Vegetable stock",qty:"1L"}], instructions:"Sauté onion and carrots. Add lentils, tomatoes and stock. Simmer 25 mins." },
+  { id:7, name:"Salmon & Veg", tags:["dinner","protein","healthy"], ingredients:[{item:"Salmon fillet",qty:"2 pieces"},{item:"Asparagus",qty:"200g"},{item:"Lemon",qty:"1"},{item:"Butter",qty:"30g"},{item:"New potatoes",qty:"300g"}], instructions:"Roast potatoes 30 mins. Pan-fry salmon 4 mins each side with butter and lemon. Steam asparagus." },
+  { id:8, name:"Veggie Omelette", tags:["breakfast","quick","protein"], ingredients:[{item:"Eggs",qty:"3"},{item:"Mushrooms",qty:"100g"},{item:"Spinach",qty:"handful"},{item:"Cheddar",qty:"30g"},{item:"Butter",qty:"10g"}], instructions:"Beat eggs, cook in butter. Add mushrooms and spinach, fold with cheese." },
+];
+
+function emptyPlan() {
+  const p = {};
+  for (let w=1;w<=2;w++) for (let d=0;d<7;d++) for (const m of MEALS) p[`${w}-${d}-${m}`]=null;
+  return p;
+}
+
+let state = { plan: emptyPlan(), recipes: DEFAULT_RECIPES, week: 1, view: "planner", filterTag: "all", shopWeeks: [1,2], checked: {} };
+
+function load() {
+  try {
+    const s = localStorage.getItem("deux-semaines-v1");
+    if (s) { const d = JSON.parse(s); Object.assign(state, d); }
+  } catch {}
+}
+function save() {
+  try { localStorage.setItem("deux-semaines-v1", JSON.stringify(state)); } catch {}
+}
+
+load();
+
+// ── HELPERS ──────────────────────────────────────────────────────────────
+function getRecipe(id) { return state.recipes.find(r => r.id === id); }
+function allTags() { return [...new Set(state.recipes.flatMap(r => r.tags))]; }
+function tagChip(t) { return `<span class="chip" style="background:${TAG_COLORS[t]||'#e0d8cc'}">${t}</span>`; }
+
+// ── VIEWS ─────────────────────────────────────────────────────────────────
+function showView(v) {
+  state.view = v;
+  document.getElementById('content').scrollTop = 0;
+  ['planner','recipes','shopping','settings'].forEach(x => {
+    document.getElementById('view-'+x).style.display = x===v ? '' : 'none';
+    const nb = document.getElementById('nav-'+x);
+    if (nb) nb.classList.toggle('active', x===v);
+  });
+  const fabWrap = document.getElementById('fab-wrap');
+  if (fabWrap) fabWrap.style.display = v==='recipes' ? 'flex' : 'none';
+  if (v==='planner') renderPlanner();
+  if (v==='recipes') renderRecipes();
+  if (v==='shopping') renderShopping();
+  if (v==='settings') renderSettings();
+}
+
+function setWeek(w) {
+  state.week = w;
+  renderPlanner();
+}
+
+// ── PLANNER ───────────────────────────────────────────────────────────────
+function renderPlanner() {
+  const w = state.week;
+  let html = `<div class="week-tabs">
+    <button class="week-tab ${w===1?'active':''}" onclick="setWeek(1)">Week 1</button>
+    <button class="week-tab ${w===2?'active':''}" onclick="setWeek(2)">Week 2</button>
+  </div>`;
+
+  for (let d = 0; d < 7; d++) {
+    html += `<div class="day-card">
+      <div class="day-header">
+        <span class="day-name">${DAYS_FULL[d]}</span>
+        <span class="day-date">Week ${w}</span>
+      </div>`;
+
+    MEALS.forEach(meal => {
+      const cell = `${w}-${d}-${meal}`;
+      const rid = state.plan[cell];
+      const recipe = rid ? getRecipe(rid) : null;
+      const cls = meal.toLowerCase();
+
+      html += `<div class="meal-row">
+        <div class="meal-tag ${cls}">${meal}</div>
+        <div class="meal-cell ${recipe?'filled':''}" onclick="openAssign('${cell}','${meal}','${DAYS_FULL[d]}')">
+          <div class="meal-cell-inner">`;
+
+      if (recipe) {
+        html += `<div class="cell-name">${recipe.name}</div>
+          <div class="cell-tags">${recipe.tags.slice(0,4).map(t=>`<span class="tag-dot" style="background:${TAG_COLORS[t]||'#ccc'}" title="${t}"></span>`).join('')}</div>`;
+      } else {
+        html += `<div class="cell-empty">Tap to add…</div>`;
+      }
+
+      html += `</div>`;
+      if (recipe) {
+        html += `<button class="cell-clear" onclick="event.stopPropagation();clearCell('${cell}')">✕</button>`;
+      }
+      html += `</div></div>`;
+    });
+
+    html += `</div>`;
+  }
+
+  document.getElementById('view-planner').innerHTML = html;
+}
+
+function clearCell(cell) {
+  state.plan[cell] = null; save(); renderPlanner();
+}
+
+// ── RECIPES ───────────────────────────────────────────────────────────────
+function renderRecipes() {
+  const ft = state.filterTag;
+  const tags = allTags();
+  let html = `<div class="filter-bar">
+    <button class="filter-btn ${ft==='all'?'active':''}" onclick="setFilter('all')">All</button>
+    ${tags.map(t=>`<button class="filter-btn ${ft===t?'active':''}" style="${ft===t?`background:${TAG_COLORS[t]||'#2c2416'};color:#2c2416`:''}" onclick="setFilter('${t}')">${t}</button>`).join('')}
+  </div>`;
+
+  const filtered = ft==='all' ? state.recipes : state.recipes.filter(r=>r.tags.includes(ft));
+  html += `<div class="recipe-grid">`;
+  filtered.forEach(r => {
+    html += `<div class="recipe-card">
+      <div class="recipe-card-top">
+        <div class="recipe-card-title">
+          <span>${r.name}</span>
+          <div style="display:flex;gap:6px">
+            <button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="openRecipe(${r.id})">👁</button>
+            <button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="deleteRecipe(${r.id})">🗑</button>
+          </div>
+        </div>
+        <div class="tags-row">${r.tags.map(tagChip).join('')}</div>
+      </div>
+      <div class="recipe-card-body">
+        ${r.ingredients.slice(0,3).map(i=>`<div class="recipe-ing"><span class="qty">${i.qty}</span> ${i.item}</div>`).join('')}
+        ${r.ingredients.length>3?`<div class="recipe-more">+${r.ingredients.length-3} more…</div>`:''}
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  document.getElementById('view-recipes').innerHTML = html;
+
+  // FAB — two buttons
+  let fabWrap = document.getElementById('fab-wrap');
+  if (!fabWrap) {
+    fabWrap = document.createElement('div');
+    fabWrap.id = 'fab-wrap';
+    fabWrap.style.cssText = 'position:fixed;bottom:calc(76px + var(--safe-bottom));right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:50';
+    fabWrap.innerHTML = `
+      <div id="fab-labels" style="display:none;flex-direction:column;align-items:flex-end;gap:10px">
+        <button onclick="openImportRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">📸</span>Import from Instagram</button>
+        <button onclick="openNewRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">✏️</span>Add manually</button>
+      </div>
+      <button id="fab-main" onclick="toggleFab()" style="background:var(--ink);color:var(--bg);border:none;border-radius:50%;width:52px;height:52px;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;transition:transform .2s">+</button>`;
+    document.body.appendChild(fabWrap);
+  }
+  fabWrap.style.display = 'flex';
+}
+
+function setFilter(t) {
+  state.filterTag = t;
+  renderRecipes();
+}
+
+// ── SHOPPING ──────────────────────────────────────────────────────────────
+function renderShopping() {
+  const fab = document.getElementById('fab-new');
+  if (fab) fab.style.display = 'none';
+
+  const sw = state.shopWeeks;
+  let html = `<div class="week-tabs" style="margin-bottom:16px">
+    ${[1,2].map(w=>`<button class="week-tab ${sw.includes(w)?'active':''}" onclick="toggleShopWeek(${w})">Week ${w}</button>`).join('')}
+    <span class="week-hint">${sw.length===2?'Both weeks':sw.length===1?`Week ${sw[0]} only`:'None'}</span>
+  </div>`;
+
+  // Build items
+  const items = {};
+  sw.forEach(w => {
+    for (let d=0;d<7;d++) for (const m of MEALS) {
+      const rid = state.plan[`${w}-${d}-${m}`];
+      if (rid) { const r = getRecipe(rid); if (r) r.ingredients.forEach(({item,qty}) => { if (!items[item]) items[item]=[]; items[item].push({qty,meal:r.name}); }); }
+    }
+  });
+
+  const keys = Object.keys(items).sort();
+  if (!keys.length) {
+    html += `<div class="empty-state">No meals planned yet —<br>head to the Planner to assign recipes!</div>`;
+  } else {
+    keys.forEach(item => {
+      const ck = !!state.checked[item];
+      html += `<div class="shop-item ${ck?'checked':''}" id="si-${item.replace(/\s/g,'_')}">
+        <input type="checkbox" ${ck?'checked':''} onchange="toggleCheck('${item.replace(/'/g,"\\'")}',this.checked)">
+        <div>
+          <div class="shop-name">${item}</div>
+          <div class="shop-meta">${items[item].map(u=>`${u.qty} for <em>${u.meal}</em>`).join(' · ')}</div>
+        </div>
+      </div>`;
+    });
+    html += `<button onclick="clearChecked()" style="background:none;border:none;color:var(--faint);font-size:13px;font-family:inherit;cursor:pointer;margin-top:8px;font-style:italic">Clear ticked items</button>`;
+  }
+
+  document.getElementById('view-shopping').innerHTML = html;
+}
+
+function toggleShopWeek(w) {
+  const ws = state.shopWeeks;
+  state.shopWeeks = ws.includes(w) ? ws.filter(x=>x!==w) : [...ws,w];
+  save(); renderShopping();
+}
+function toggleCheck(item, val) {
+  if (val) state.checked[item]=true; else delete state.checked[item];
+  save();
+  const el = document.getElementById('si-'+item.replace(/\s/g,'_'));
+  if (el) el.classList.toggle('checked', val);
+}
+function clearChecked() { state.checked={}; save(); renderShopping(); }
+
+// ── MODALS ────────────────────────────────────────────────────────────────
+function openModal(title, bodyHTML) {
+  document.getElementById('modal-title').innerHTML = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('content').style.overflow = 'hidden';
+}
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal')) return;
+  document.getElementById('modal').style.display = 'none';
+  document.getElementById('content').style.overflow = '';
+}
+
+function openAssign(cell, meal, dayName) {
+  const w = cell.split('-')[0];
+  let body = `<p style="font-size:13px;color:var(--faint);font-style:italic;margin-bottom:14px">${meal} · ${dayName} · Week ${w}</p>`;
+  state.recipes.forEach(r => {
+    body += `<button class="assign-btn" onclick="assignRecipe('${cell}',${r.id})">
+      <div class="assign-name">${r.name}</div>
+      <div class="tags-row">${r.tags.map(tagChip).join('')}</div>
+    </button>`;
+  });
+  openModal('Choose a recipe', body);
+}
+
+function assignRecipe(cell, rid) {
+  state.plan[cell] = rid; save();
+  closeModal(); renderPlanner();
+}
+
+function openRecipe(id) {
+  const r = getRecipe(id);
+  if (!r) return;
+  let body = `<div class="tags-row" style="margin-bottom:16px">${r.tags.map(tagChip).join('')}</div>`;
+  body += `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Ingredients</div>`;
+  r.ingredients.forEach(i => body += `<div class="detail-row"><span>${i.item}</span><span class="detail-qty">${i.qty}</span></div>`);
+  if (r.instructions) body += `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 8px">Method</div><p class="method-text">${r.instructions}</p>`;
+  body += `<div style="height:8px"></div>`;
+  openModal(r.name, body);
+}
+
+function deleteRecipe(id) {
+  if (!confirm('Delete this recipe?')) return;
+  state.recipes = state.recipes.filter(r=>r.id!==id);
+  Object.keys(state.plan).forEach(k => { if (state.plan[k]===id) state.plan[k]=null; });
+  save(); renderRecipes();
+}
+
+// ── NEW RECIPE ────────────────────────────────────────────────────────────
+let newIngCount = 1;
+
+function openNewRecipe() {
+  newIngCount = 1;
+  const body = `
+    <label class="field-label" style="margin-top:0">Recipe Name</label>
+    <input type="text" id="nr-name" placeholder="e.g. Chicken Tikka Masala">
+    <label class="field-label">Tags <span style="font-weight:400;color:var(--faint)">(comma-separated)</span></label>
+    <input type="text" id="nr-tags" placeholder="e.g. dinner, protein, quick">
+    <label class="field-label">Ingredients</label>
+    <div id="nr-ings">
+      <div class="ing-row">
+        <input type="text" placeholder="Ingredient" id="ni-item-0">
+        <input type="text" placeholder="Qty" id="ni-qty-0">
+      </div>
+    </div>
+    <button class="add-ing-btn" onclick="addIngRow()">+ add ingredient</button>
+    <label class="field-label">Method</label>
+    <textarea id="nr-method" placeholder="How to make it…"></textarea>
+    <button class="save-btn" onclick="saveNewRecipe()">Save Recipe</button>
+    <div style="height:4px"></div>`;
+  openModal('New Recipe', body);
+}
+
+function addIngRow() {
+  const c = newIngCount++;
+  const div = document.createElement('div');
+  div.className = 'ing-row';
+  div.innerHTML = `<input type="text" placeholder="Ingredient" id="ni-item-${c}"><input type="text" placeholder="Qty" id="ni-qty-${c}">`;
+  document.getElementById('nr-ings').appendChild(div);
+}
+
+function saveNewRecipe() {
+  const name = document.getElementById('nr-name').value.trim();
+  if (!name) { alert('Please enter a recipe name'); return; }
+  const tags = document.getElementById('nr-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const instructions = document.getElementById('nr-method').value.trim();
+  const ingredients = [];
+  for (let i=0;i<newIngCount;i++) {
+    const item = document.getElementById(`ni-item-${i}`)?.value.trim();
+    const qty  = document.getElementById(`ni-qty-${i}`)?.value.trim();
+    if (item) ingredients.push({item, qty: qty||''});
+  }
+  state.recipes.push({ id: Date.now(), name, tags, instructions, ingredients });
+  save(); closeModal(); renderRecipes();
+}
+
+// ── FAB TOGGLE ────────────────────────────────────────────────────────────
+function toggleFab() {
+  const labels = document.getElementById('fab-labels');
+  const btn = document.getElementById('fab-main');
+  const open = labels.style.display === 'flex';
+  labels.style.display = open ? 'none' : 'flex';
+  btn.style.transform = open ? '' : 'rotate(45deg)';
+}
+
+// ── IMPORT FROM INSTAGRAM ─────────────────────────────────────────────────
+let importImageB64 = null;
+let importImageType = null;
+let parsedImport = null;
+
+function openImportRecipe() {
+  // close fab
+  const labels = document.getElementById('fab-labels');
+  const btn = document.getElementById('fab-main');
+  if (labels) { labels.style.display='none'; btn.style.transform=''; }
+  importImageB64 = null; importImageType = null; parsedImport = null;
+
+  const body = `
+    <div class="import-tabs">
+      <button class="import-tab active" id="itab-text" onclick="switchImportTab('text')">📋 Paste Caption</button>
+      <button class="import-tab" id="itab-image" onclick="switchImportTab('image')">📸 Screenshot</button>
+    </div>
+
+    <div class="import-panel active" id="ipanel-text">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Copy the recipe caption from Instagram and paste it below.</p>
+      <textarea id="import-text" style="width:100%;height:140px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical" placeholder="Paste the Instagram caption here…"></textarea>
+      <button class="save-btn" style="margin-top:10px" onclick="parseTextRecipe()">✨ Parse Recipe</button>
+    </div>
+
+    <div class="import-panel" id="ipanel-image">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Upload a screenshot of the Instagram post.</p>
+      <div class="upload-zone" onclick="document.getElementById('img-upload').click()">
+        <div id="upload-preview-wrap">
+          <div class="icon">📷</div>
+          <p>Tap to choose a screenshot</p>
+        </div>
+      </div>
+      <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+      <button class="save-btn" style="margin-top:12px" id="parse-img-btn" disabled onclick="parseImageRecipe()">✨ Parse Recipe</button>
+    </div>
+
+    <div id="import-loading" style="display:none;margin-top:14px">
+      <div class="ai-loading"><div class="spinner"></div>Reading recipe with AI…</div>
+    </div>
+    <div id="import-result" style="display:none;margin-top:14px"></div>`;
+
+  openModal('Import from Instagram', body);
+}
+
+function switchImportTab(tab) {
+  ['text','image'].forEach(t => {
+    document.getElementById('itab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('ipanel-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  importImageType = file.type;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    importImageB64 = ev.target.result.split(',')[1];
+    const wrap = document.getElementById('upload-preview-wrap');
+    wrap.innerHTML = `<img src="${ev.target.result}" class="upload-preview">`;
+    document.getElementById('parse-img-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function parseTextRecipe() {
+  const text = document.getElementById('import-text').value.trim();
+  if (!text) { alert('Please paste some text first'); return; }
+  await callClaudeForRecipe([{ type:'text', text:`Extract the recipe from this Instagram caption:\n\n${text}` }]);
+}
+
+async function parseImageRecipe() {
+  if (!importImageB64) return;
+  await callClaudeForRecipe([
+    { type:'image', source:{ type:'base64', media_type: importImageType, data: importImageB64 } },
+    { type:'text', text:'Extract the recipe from this Instagram screenshot.' }
+  ]);
+}
+
+async function callClaudeForRecipe(contentBlocks) {
+  document.getElementById('import-loading').style.display = 'block';
+  document.getElementById('import-result').style.display = 'none';
+  parsedImport = null;
+
+  const prompt = `You are a recipe parser. Extract the recipe from the provided text or image and return ONLY valid JSON with no markdown, no preamble, no backticks. Use this exact shape:
+{
+  "name": "Recipe Name",
+  "tags": ["dinner","quick"],
+  "instructions": "Step by step method as a single paragraph.",
+  "ingredients": [
+    {"item": "Ingredient name", "qty": "amount + unit"},
+    {"item": "Another ingredient", "qty": "2 tbsp"}
+  ]
+}
+For tags, pick relevant ones from: breakfast, lunch, dinner, quick, vegetarian, vegan, protein, healthy, prep-ahead.
+If no clear recipe is found, return {"error": "No recipe found"}.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: prompt,
+        messages: [{ role: 'user', content: contentBlocks }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = (data.content || []).map(b => b.text || '').join('').trim();
+    const clean = raw.replace(/^```json|^```|```$/gm,'').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('import-loading').style.display = 'none';
+
+    if (parsed.error) {
+      document.getElementById('import-result').style.display = 'block';
+      document.getElementById('import-result').innerHTML = `<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ ${parsed.error}. Try pasting the caption text instead.</div>`;
+      return;
+    }
+
+    parsedImport = parsed;
+    const resultDiv = document.getElementById('import-result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div class="ai-result">
+        <strong style="font-size:14px">✅ ${parsed.name}</strong>
+        <div style="margin-top:6px;font-size:12px;color:var(--muted)">${parsed.ingredients.length} ingredients · ${parsed.tags.join(', ')}</div>
+        <div style="margin-top:6px;font-size:12px;line-height:1.5">${parsed.ingredients.slice(0,4).map(i=>`${i.qty} ${i.item}`).join(' · ')}${parsed.ingredients.length>4?` · +${parsed.ingredients.length-4} more`:''}</div>
+      </div>
+      <button class="import-btn" onclick="confirmImport()">Add to My Recipes →</button>`;
+  } catch (err) {
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-result').style.display = 'block';
+    document.getElementById('import-result').innerHTML = `<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ Something went wrong. Please try again.</div>`;
+  }
+}
+
+function confirmImport() {
+  if (!parsedImport) return;
+  state.recipes.push({ id: Date.now(), ...parsedImport });
+  save(); closeModal(); renderRecipes();
+}
+
+// ── GOOGLE SHEETS SYNC ───────────────────────────────────────────────────
+const APPS_SCRIPT_CODE = `function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data") 
+              || SpreadsheetApp.getActiveSpreadsheet().insertSheet("data");
+  var data = sheet.getRange("A1").getValue();
+  return ContentService.createTextOutput(data || "{}").setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data") 
+              || SpreadsheetApp.getActiveSpreadsheet().insertSheet("data");
+  sheet.getRange("A1").setValue(e.postData.contents);
+  return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
+}`;
+
+function setSyncUrl(url) {
+  state.syncUrl = url.trim();
+  save();
+  updateSyncDot('off', 'not tested');
+}
+
+function updateSyncDot(status, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + status;
+  if (lbl) lbl.textContent = label;
+}
+
+async function syncToSheet() {
+  if (!state.syncUrl) return false;
+  updateSyncDot('syncing', 'syncing…');
+  try {
+    const payload = JSON.stringify({ plan: state.plan, recipes: state.recipes });
+    await fetch(state.syncUrl, {
+      method: 'POST',
+      body: payload,
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    updateSyncDot('ok', 'synced');
+    state.lastSync = new Date().toISOString();
+    save();
+    return true;
+  } catch (e) {
+    updateSyncDot('err', 'sync failed');
+    return false;
+  }
+}
+
+async function loadFromSheet() {
+  if (!state.syncUrl) return false;
+  updateSyncDot('syncing', 'loading…');
+  try {
+    const res = await fetch(state.syncUrl + '?t=' + Date.now());
+    const text = await res.text();
+    if (!text || text === '{}') { updateSyncDot('ok', 'synced'); return false; }
+    const data = JSON.parse(text);
+    if (data.plan) state.plan = data.plan;
+    if (data.recipes) state.recipes = data.recipes;
+    save();
+    updateSyncDot('ok', 'synced');
+    return true;
+  } catch (e) {
+    updateSyncDot('err', 'load failed');
+    return false;
+  }
+}
+
+async function testAndConnect() {
+  const input = document.getElementById('sync-url-input');
+  if (!input) return;
+  const url = input.value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    showSettingsStatus('err', '⚠️ That doesn\'t look like a Google Apps Script URL. It should start with https://script.google.com/…');
+    return;
+  }
+  state.syncUrl = url; save();
+  showSettingsStatus('ok', '⏳ Testing connection…');
+  const ok = await loadFromSheet();
+  if (ok !== false || state.syncUrl) {
+    showSettingsStatus('ok', '✅ Connected! Your plan will now sync automatically.');
+    renderPlanner(); renderRecipes();
+  } else {
+    showSettingsStatus('err', '⚠️ Could not connect. Double-check the URL and that you deployed as "Anyone".');
+  }
+}
+
+async function manualSync() {
+  const btn = document.getElementById('sync-now-btn');
+  if (btn) btn.disabled = true;
+  await loadFromSheet();
+  await syncToSheet();
+  if (btn) btn.disabled = false;
+  renderPlanner(); renderRecipes(); renderShopping();
+  showSettingsStatus('ok', '✅ Synced successfully!');
+}
+
+function showSettingsStatus(type, msg) {
+  const box = document.getElementById('settings-status');
+  if (!box) return;
+  box.className = 'status-box ' + type;
+  box.style.display = 'block';
+  box.textContent = msg;
+}
+
+function copyScriptCode() {
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+    const btn = document.getElementById('copy-code-btn');
+    if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = 'Copy to clipboard', 2000); }
+  }).catch(() => {
+    // fallback: select the text
+    const el = document.getElementById('script-code-block');
+    if (el) { const r = document.createRange(); r.selectNode(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }
+  });
+}
+
+// ── SETTINGS VIEW ─────────────────────────────────────────────────────────
+function renderSettings() {
+  const connected = !!state.syncUrl;
+  const html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px">Settings</h2>
+
+    <div class="settings-section">
+      <h3>🔄 Google Sheets Sync</h3>
+      <p>Share your meal plan with your partner in real time using a free Google Sheet. Follow these steps once:</p>
+      <ol>
+        <li>Go to <strong>sheets.google.com</strong> and create a new blank spreadsheet</li>
+        <li>Click <strong>Extensions → Apps Script</strong></li>
+        <li>Delete everything in the editor, paste the code below, then click <strong>Save</strong></li>
+        <li>Click <strong>Deploy → New deployment</strong></li>
+        <li>Set type to <strong>Web app</strong>, set "Who has access" to <strong>Anyone</strong>, click <strong>Deploy</strong></li>
+        <li>Copy the <strong>Web app URL</strong> and paste it below</li>
+        <li>Share the Google Sheet with your partner's Gmail so they can see the data</li>
+      </ol>
+
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Apps Script Code</span>
+          <button class="copy-code-btn" id="copy-code-btn" onclick="copyScriptCode()">Copy to clipboard</button>
+        </div>
+        <div class="script-code" id="script-code-block">${APPS_SCRIPT_CODE.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+
+      <label style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Your Web App URL</label>
+      <div class="sync-url-row">
+        <input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/…" value="${state.syncUrl || ''}">
+        <button class="connect-btn" onclick="testAndConnect()">Connect</button>
+      </div>
+      <div id="settings-status" class="status-box ${connected?'ok':''}` + `" style="${connected?'display:block':'display:none'}">${connected ? '✅ Connected to Google Sheets' : ''}</div>
+
+      ${connected ? `<button class="sync-now-btn" id="sync-now-btn" onclick="manualSync()">↕ Sync Now</button>` : ''}
+    </div>
+
+    <div class="settings-section">
+      <h3>⚠️ Reset Data</h3>
+      <p>Clear all local data on this device. This won't affect your partner's data or the Google Sheet.</p>
+      <button onclick="resetData()" style="background:none;border:1.5px solid #e57373;color:#c62828;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Reset this device</button>
+    </div>`;
+
+  document.getElementById('view-settings').innerHTML = html;
+}
+
+function resetData() {
+  if (!confirm('Reset all data on this device? This cannot be undone.')) return;
+  state.plan = emptyPlan();
+  state.recipes = DEFAULT_RECIPES;
+  state.checked = {};
+  save();
+  showView('planner');
+}
+
+// ── AUTO-SYNC on save ─────────────────────────────────────────────────────
+const _origSave = save;
+function save() {
+  try { localStorage.setItem('deux-semaines-v1', JSON.stringify(state)); } catch {}
+  if (state.syncUrl) syncToSheet();
+}
+
+// ── PWA INSTALL ───────────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('install-dismissed')) {
+    setTimeout(() => { document.getElementById('install-banner').style.display = 'block'; }, 2000);
+  }
+});
+function installApp() {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt=null; dismissBanner(); }); }
+}
+function dismissBanner() {
+  document.getElementById('install-banner').style.display = 'none';
+  localStorage.setItem('install-dismissed','1');
+}
+window.addEventListener('appinstalled', () => { document.getElementById('install-banner').style.display='none'; });
+
+// ── SERVICE WORKER ────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'deux-semaines-v1';
+    self.addEventListener('install', e => { self.skipWaiting(); });
+    self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); });
+    self.addEventListener('fetch', e => {
+      if (e.request.mode === 'navigate') {
+        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+      }
+    });
+  `;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL).catch(() => {});
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+showView('planner');
+if (state.syncUrl) {
+  updateSyncDot('syncing', 'loading…');
+  loadFromSheet().then(changed => { if (changed) { renderPlanner(); renderRecipes(); } });
+}
+</script>
+</body>
+</html>
