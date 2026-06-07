@@ -1,74 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#2c2416" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Deux Semaines" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="theme-color" content="#2c2416"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Deux Semaines"/>
   <title>Deux Semaines</title>
   <script>
-    const manifest = {
-      name:"Deux Semaines",short_name:"Meal Plan",description:"Two-week meal rotation planner",
-      start_url:".",display:"standalone",background_color:"#faf8f3",theme_color:"#2c2416",orientation:"portrait-primary",
-      icons:[
-        {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232c2416'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"},
-        {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%232c2416'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle'%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml"}
-      ]
-    };
-    const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-    document.write('<link rel="manifest" href="'+URL.createObjectURL(blob)+'">');
+    const m={name:"Deux Semaines",short_name:"Meal Plan",start_url:".",display:"standalone",background_color:"#faf8f3",theme_color:"#2c2416",orientation:"portrait-primary",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232c2416'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"}]};
+    document.write('<link rel="manifest" href="'+URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}))+'">');
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#faf8f3;--ink:#2c2416;--ink2:#4a3a28;--muted:#7a6a52;--faint:#9a8060;--border:#e0d8cc;--surface:#ffffff;--warm:#f0ece4;--accent:#c9b99a;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+    :root{--bg:#faf8f3;--ink:#2c2416;--ink2:#4a3a28;--muted:#7a6a52;--faint:#9a8060;--border:#e0d8cc;--surface:#fff;--warm:#f0ece4;--accent:#c9b99a;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
     html,body{height:100%;overflow:hidden}
     body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;height:100dvh}
     header{background:var(--ink);color:var(--bg);padding:calc(12px + var(--safe-top)) 20px 12px;flex-shrink:0}
     .header-inner{display:flex;align-items:center;justify-content:space-between}
-    .logo{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+    .logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
     .logo-sub{font-size:11px;color:var(--accent);font-style:italic;margin-left:8px}
     .sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
     .sync-dot.ok{background:#81c784}.sync-dot.err{background:#e57373}.sync-dot.off{background:#888}
-    .sync-dot.syncing{background:#ffb74d;animation:pulse .8s ease-in-out infinite}
+    .sync-dot.syncing{background:#ffb74d;animation:pulse .8s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
     .header-right{display:flex;align-items:center;gap:10px}
     .settings-btn{background:none;border:none;color:var(--accent);font-size:20px;cursor:pointer;padding:2px;line-height:1}
     nav{background:var(--ink);display:flex;padding:8px 0 calc(8px + var(--safe-bottom));flex-shrink:0;border-top:1px solid #3d3020}
-    nav button{flex:1;background:none;border:none;color:var(--accent);font-family:'Source Serif 4',serif;font-size:10px;font-weight:400;padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;letter-spacing:.04em}
+    nav button{flex:1;background:none;border:none;color:var(--accent);font-family:'Source Serif 4',serif;font-size:9px;font-weight:400;padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;letter-spacing:.04em}
     nav button.active{color:var(--bg);font-weight:600}
-    nav button span.icon{font-size:18px;line-height:1}
+    nav button span.icon{font-size:17px;line-height:1}
     .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-    .page{padding:16px 16px 24px}
+    .page{padding:16px 16px 100px}
     .week-tabs{display:flex;gap:8px;margin-bottom:16px;align-items:center}
     .week-tab{background:var(--warm);border:none;border-radius:20px;padding:6px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);transition:all .15s}
     .week-tab.active{background:var(--ink);color:var(--bg)}
     .week-hint{font-size:12px;color:var(--faint);font-style:italic;margin-left:auto}
-    /* planner */
     .day-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
-    .day-header{background:var(--ink);color:var(--bg);padding:10px 14px;display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+    .day-header{background:var(--ink);color:var(--bg);padding:10px 14px;display:flex;align-items:center;gap:8px;justify-content:space-between}
     .day-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700}
-    .day-date{font-size:11px;color:var(--accent);font-style:italic}
     .eating-out-btn{font-size:11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:12px;padding:3px 9px;cursor:pointer;font-family:inherit;white-space:nowrap}
     .eating-out-badge{font-size:11px;color:var(--accent);font-style:italic}
     .meal-row{display:flex;align-items:stretch;border-bottom:1px solid var(--warm)}
     .meal-row:last-child{border-bottom:none}
-    .meal-tag{width:84px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);padding:10px 8px}
-    .meal-tag.breakfast{background:#fff8e1}.meal-tag.lunch{background:#e0f2f1}.meal-tag.dinner{background:#ede7f6}
-    .meal-cell{flex:1;padding:10px 12px;cursor:pointer;position:relative;min-height:52px;display:flex;align-items:center;transition:background .1s}
+    .meal-tag{width:78px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);padding:8px 6px;text-align:center}
+    .meal-tag.breakfast{background:#fff8e1}.meal-tag.lunch{background:#e0f2f1}.meal-tag.dinner{background:#ede7f6}.meal-tag.snack{background:#fce4ec}.meal-tag.dessert{background:#f3e5f5}
+    .meal-cell{flex:1;padding:9px 10px;cursor:pointer;min-height:48px;display:flex;align-items:center;transition:background .1s}
     .meal-cell:active{background:var(--warm)}.meal-cell.filled{background:#fdfcf9}
+    .meal-cell.move-source{background:#fff8e1;border-left:3px solid #f9a825}
+    .meal-cell.move-target{border-left:3px solid #f9a825!important;background:#fffde7!important;cursor:pointer!important}
     .meal-cell-inner{flex:1}
     .cell-empty{color:#ccc;font-size:12px}
-    .cell-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px}
+    .cell-name{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px}
     .cell-tags{display:flex;flex-wrap:wrap;gap:3px}
-    .tag-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
-    .cell-actions{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
-    .cell-icon-btn{background:none;border:none;cursor:pointer;font-size:13px;color:#ccc;padding:3px 5px;line-height:1}
-    /* recipes */
+    .tag-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+    .cell-actions{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+    .cell-icon-btn{background:none;border:none;cursor:pointer;font-size:12px;color:#ccc;padding:2px 4px;line-height:1}
+    .move-banner{background:#f9a825;color:#2c2416;padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .move-cancel-btn{background:rgba(0,0,0,.15);border:none;border-radius:8px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink)}
+    .cat-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .cat-tabs::-webkit-scrollbar{display:none}
+    .cat-tab{border-radius:20px;border:none;padding:6px 14px;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;background:var(--warm);color:var(--ink);font-weight:600}
+    .cat-tab.active{background:var(--ink);color:var(--bg)}
     .recipe-grid{display:flex;flex-direction:column;gap:10px}
     .recipe-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .recipe-card-top{padding:12px 14px 10px;border-bottom:1px solid var(--warm)}
@@ -79,11 +75,6 @@
     .recipe-more{font-size:12px;color:var(--faint);font-style:italic}
     .tags-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
     .chip{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
-    .filter-bar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:14px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-    .filter-bar::-webkit-scrollbar{display:none}
-    .filter-btn{border-radius:20px;border:none;padding:5px 12px;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;transition:all .12s;background:var(--warm);color:var(--ink);font-weight:400}
-    .filter-btn.active{background:var(--ink);color:var(--bg);font-weight:600}
-    /* shopping */
     .shop-section{margin-bottom:18px}
     .shop-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
     .shop-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
@@ -92,8 +83,8 @@
     .shop-name{font-size:14px;font-weight:600}
     .shop-meta{font-size:12px;color:var(--faint);margin-top:2px}
     .pantry-badge{font-size:10px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:8px;padding:1px 6px;margin-left:6px;font-weight:600}
-    /* modal */
-    .modal-overlay{position:fixed;inset:0;background:rgba(44,36,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:300;padding:0}
+    .freezer-badge{font-size:10px;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;border-radius:8px;padding:1px 6px;margin-left:6px;font-weight:600}
+    .modal-overlay{position:fixed;inset:0;background:rgba(44,36,22,.55);display:flex;align-items:flex-end;justify-content:center;z-index:300}
     .modal-sheet{background:var(--bg);border-radius:18px 18px 0 0;width:100%;max-width:600px;max-height:88dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(16px + var(--safe-bottom));animation:slideUp .22s ease-out}
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 4px}
@@ -101,53 +92,42 @@
     .modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
     .modal-close{background:none;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:15px;color:var(--muted);display:flex;align-items:center;justify-content:center}
     .modal-body{padding:0 20px}
-    /* forms */
     label.field-label{display:block;font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;margin-top:14px}
-    input[type=text],input[type=number],textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;transition:border-color .12s}
-    input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(--ink)}
+    input[type=text],input[type=number],input[type=password],textarea,select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;transition:border-color .12s}
+    input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{border-color:var(--ink)}
     textarea{height:80px;resize:vertical}
     .ing-row{display:flex;gap:8px;margin-bottom:6px}
     .ing-row input:first-child{flex:3}.ing-row input:last-child{flex:1}
     .add-ing-btn{font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 0}
     .save-btn{width:100%;padding:13px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:18px}
-    /* serving scaler */
     .scaler-row{display:flex;align-items:center;gap:12px;background:var(--warm);border-radius:10px;padding:10px 14px;margin-bottom:16px}
     .scaler-label{font-size:13px;font-weight:600;flex:1}
-    .scaler-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--ink)}
+    .scaler-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink)}
     .scaler-val{font-size:18px;font-weight:700;min-width:28px;text-align:center}
-    /* detail */
     .detail-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--warm);font-size:14px}
     .detail-qty{color:var(--faint);font-weight:600}
-    .method-text{font-size:14px;line-height:1.75;color:var(--ink2);margin-top:4px}
-    /* assign */
-    .assign-btn{display:block;width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;text-align:left;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:border-color .12s}
+    .assign-btn{display:block;width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;text-align:left;cursor:pointer;font-family:inherit;margin-bottom:8px}
     .assign-btn:active{border-color:var(--ink);background:var(--warm)}
     .assign-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
     .empty-state{text-align:center;padding:60px 20px;color:var(--faint);font-style:italic;font-size:15px}
-    /* settings */
     .settings-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
     .settings-section h3{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px}
     .settings-section p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
     .settings-section ol{font-size:13px;color:var(--muted);line-height:1.8;padding-left:18px;margin-bottom:14px}
-    .settings-section ol li{margin-bottom:2px}
     .sync-url-row{display:flex;gap:8px}
     .sync-url-row input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none}
-    .sync-url-row input:focus{border-color:var(--ink)}
     .connect-btn{background:var(--ink);color:var(--bg);border:none;border-radius:8px;padding:10px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
     .sync-now-btn{width:100%;padding:11px;background:#3d6b38;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-top:10px}
-    .sync-now-btn:disabled{opacity:.5;cursor:not-allowed}
     .status-box{border-radius:8px;padding:10px 14px;font-size:13px;margin-top:10px;display:none}
     .status-box.ok{background:#f0f7ee;border:1px solid #b8ddb4;color:#2a4a26}
     .status-box.err{background:#fdf0f0;border:1px solid #e0b0b0;color:#6b2a2a}
     .script-code{background:#1e1e1e;color:#d4d4d4;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre;margin-bottom:10px}
     .copy-code-btn{background:var(--warm);border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink)}
-    /* import */
     .import-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
-    .import-tab{flex:1;padding:10px 8px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:-1px}
+    .import-tab{flex:1;padding:10px 8px;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;margin-bottom:-1px}
     .import-tab.active{color:var(--ink);border-bottom-color:var(--ink)}
     .import-panel{display:none}.import-panel.active{display:block}
-    .upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .15s;background:var(--warm)}
-    .upload-zone:active{border-color:var(--ink)}
+    .upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;background:var(--warm)}
     .upload-zone .icon{font-size:36px;margin-bottom:8px}
     .upload-zone p{font-size:13px;color:var(--muted)}
     .upload-preview{width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:12px}
@@ -156,788 +136,358 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .ai-result{background:#f0f7ee;border:1px solid #b8ddb4;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#2a4a26}
     .import-btn{width:100%;padding:12px;background:#3d6b38;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px}
-    .import-btn:disabled{opacity:.5;cursor:not-allowed}
-    /* pantry */
     .pantry-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
     .pantry-name{flex:1;font-size:14px;font-weight:600}
-    .pantry-qty{font-size:13px;color:var(--faint)}
     .pantry-del{background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:2px 4px}
-    /* extra shopping items */
+    .freezer-item{background:var(--surface);border:1px solid #90caf9;border-radius:8px;padding:12px 14px;margin-bottom:8px}
+    .freezer-item-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+    .freezer-name{font-size:14px;font-weight:700}
+    .freezer-meta{font-size:12px;color:var(--faint);margin-top:2px}
+    .freezer-portions{display:inline-flex;align-items:center;gap:6px;background:#e3f2fd;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600;color:#1565c0}
+    .freezer-adj{background:none;border:none;cursor:pointer;font-size:16px;color:#1565c0;padding:0 2px;line-height:1}
     .extra-add-row{display:flex;gap:8px;margin-bottom:12px}
     .extra-add-row input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none}
     .extra-add-row button{background:var(--ink);color:var(--bg);border:none;border-radius:8px;padding:9px 14px;font-size:20px;cursor:pointer}
-    /* install banner */
+    .section-h{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px}
+    .section-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+    .fab-wrap{position:fixed;bottom:calc(76px + var(--safe-bottom));right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:50}
     #install-banner{display:none;position:fixed;bottom:calc(72px + var(--safe-bottom));left:12px;right:12px;background:var(--ink);color:var(--bg);border-radius:12px;padding:14px 16px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.25)}
     #install-banner p{font-size:13px;margin-bottom:10px;line-height:1.5}
     #install-banner .banner-btns{display:flex;gap:8px}
     #install-banner button{flex:1;padding:9px;border-radius:8px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
     #install-btn{background:var(--accent);color:var(--ink)}
     #dismiss-btn{background:#3d3020;color:var(--bg)}
-    .fab-wrap{position:fixed;bottom:calc(76px + var(--safe-bottom));right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:50}
   </style>
 </head>
 <body>
- 
 <header>
   <div class="header-inner">
-    <div>
-      <span class="logo">Deux Semaines</span>
-      <span class="logo-sub">meal planner</span>
-    </div>
+    <div><span class="logo">Deux Semaines</span><span class="logo-sub">meal planner</span></div>
     <div class="header-right">
       <span id="sync-status" style="font-size:11px;color:var(--accent);display:flex;align-items:center;cursor:pointer" onclick="showView('settings')">
         <span class="sync-dot off" id="sync-dot"></span><span id="sync-label">not synced</span>
       </span>
-      <button class="settings-btn" onclick="showView('settings')" title="Settings">⚙️</button>
+      <button class="settings-btn" onclick="showView('settings')">&#9881;&#65039;</button>
     </div>
   </div>
 </header>
- 
+<div id="move-banner" class="move-banner" style="display:none">
+  <span id="move-banner-text">Tap a slot to move here</span>
+  <button class="move-cancel-btn" onclick="cancelMove()">Cancel</button>
+</div>
 <div class="content" id="content">
   <div id="view-planner" class="page"></div>
   <div id="view-recipes" class="page" style="display:none"></div>
   <div id="view-shopping" class="page" style="display:none"></div>
+  <div id="view-freezer" class="page" style="display:none"></div>
   <div id="view-pantry" class="page" style="display:none"></div>
   <div id="view-settings" class="page" style="display:none"></div>
 </div>
- 
 <nav>
-  <button class="active" onclick="showView('planner')" id="nav-planner"><span class="icon">📅</span>Planner</button>
-  <button onclick="showView('recipes')" id="nav-recipes"><span class="icon">🍳</span>Recipes</button>
-  <button onclick="showView('shopping')" id="nav-shopping"><span class="icon">🛒</span>Shopping</button>
-  <button onclick="showView('pantry')" id="nav-pantry"><span class="icon">🥫</span>Pantry</button>
-  <button onclick="showView('settings')" id="nav-settings"><span class="icon">⚙️</span>Settings</button>
+  <button class="active" onclick="showView('planner')" id="nav-planner"><span class="icon">&#128197;</span>Planner</button>
+  <button onclick="showView('recipes')" id="nav-recipes"><span class="icon">&#127859;</span>Recipes</button>
+  <button onclick="showView('shopping')" id="nav-shopping"><span class="icon">&#128722;</span>Shopping</button>
+  <button onclick="showView('freezer')" id="nav-freezer"><span class="icon">&#129482;</span>Freezer</button>
+  <button onclick="showView('pantry')" id="nav-pantry"><span class="icon">&#129475;</span>Pantry</button>
+  <button onclick="showView('settings')" id="nav-settings"><span class="icon">&#9881;&#65039;</span>Settings</button>
 </nav>
- 
 <div class="modal-overlay" id="modal" style="display:none" onclick="closeModal(event)">
-  <div class="modal-sheet" id="modal-sheet">
+  <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-head">
       <div class="modal-title" id="modal-title"></div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()">&#10005;</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
- 
 <div id="install-banner">
-  <p>📲 Add <strong>Deux Semaines</strong> to your home screen for quick access!</p>
+  <p>&#128242; Add <strong>Deux Semaines</strong> to your home screen!</p>
   <div class="banner-btns">
     <button id="install-btn" onclick="installApp()">Add to Home Screen</button>
     <button id="dismiss-btn" onclick="dismissBanner()">Not now</button>
   </div>
 </div>
- 
 <script>
-const DAYS_SHORT=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const DAYS_FULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const MEALS=["Breakfast","Lunch","Dinner"];
-const TAG_COLORS={breakfast:"#f9d85e",lunch:"#6fcfc8",dinner:"#9fa8da",quick:"#a5d6a7",vegetarian:"#c5e1a5",vegan:"#80cbc4",protein:"#ef9a9a",healthy:"#80deea","prep-ahead":"#ce93d8"};
-const AISLE_MAP={
-  "Produce":["avocado","tomato","tomatoes","cucumber","zucchini","onion","garlic","lemon","lime","spinach","kale","lettuce","broccoli","asparagus","carrot","carrots","pepper","peppers","mushroom","mushrooms","ginger","berries","fruit","herbs","basil","coriander","parsley","mint"],
-  "Meat & Fish":["chicken","beef","pork","lamb","salmon","tuna","prawns","shrimp","mince","bacon","sausage","turkey","duck","fish","fillet"],
-  "Dairy & Eggs":["milk","cream","butter","cheese","cheddar","parmesan","feta","yogurt","yoghurt","eggs","egg"],
-  "Bakery":["bread","sourdough","pita","tortilla","wrap","roll","bun","flour","oats"],
-  "Dry & Tins":["pasta","rice","lentils","beans","chickpeas","canned","tinned","stock","noodles","couscous","quinoa","chia","seeds"],
-  "Sauces & Oils":["oil","olive oil","sesame oil","soy sauce","vinegar","honey","sauce","paste","ketchup","mustard","mayonnaise"],
-  "Spices":["salt","pepper","cumin","paprika","turmeric","cinnamon","chilli","oregano","thyme","rosemary","bay","spice","flakes"],
-  "Frozen":["frozen"],
-  "Other":[]
-};
- 
+const MEALS=["Breakfast","Lunch","Dinner","Snack","Dessert"];
+const MEAL_CSS={Breakfast:"breakfast",Lunch:"lunch",Dinner:"dinner",Snack:"snack",Dessert:"dessert"};
+const TAG_COLORS={breakfast:"#f9d85e",lunch:"#6fcfc8",dinner:"#9fa8da",snack:"#ffab91",dessert:"#f48fb1",quick:"#a5d6a7",vegetarian:"#c5e1a5",vegan:"#80cbc4",protein:"#ef9a9a",healthy:"#80deea","prep-ahead":"#ce93d8"};
+const RECIPE_CATS=["All","Breakfast","Lunch","Dinner","Snack","Dessert","Other"];
+const AISLE_MAP={"Produce":["avocado","tomato","tomatoes","cucumber","zucchini","onion","garlic","lemon","lime","spinach","kale","lettuce","broccoli","asparagus","carrot","carrots","pepper","peppers","mushroom","mushrooms","ginger","berries","fruit","herbs","basil","coriander","parsley","mint"],"Meat & Fish":["chicken","beef","pork","lamb","salmon","tuna","prawns","shrimp","mince","bacon","sausage","turkey","duck","fish","fillet"],"Dairy & Eggs":["milk","cream","butter","cheese","cheddar","parmesan","feta","yogurt","yoghurt","eggs","egg"],"Bakery":["bread","sourdough","pita","tortilla","wrap","roll","bun","flour","oats"],"Dry & Tins":["pasta","rice","lentils","beans","chickpeas","canned","tinned","stock","noodles","couscous","quinoa","chia","seeds"],"Sauces & Oils":["oil","olive oil","sesame oil","soy sauce","vinegar","honey","sauce","paste","ketchup","mustard","mayonnaise"],"Spices":["salt","pepper","cumin","paprika","turmeric","cinnamon","chilli","oregano","thyme","rosemary","bay","spice","flakes"],"Frozen":["frozen"],"Other":[]};
 const DEFAULT_RECIPES=[
-  {id:1,name:"Avocado Toast",tags:["breakfast","quick"],servings:2,ingredients:[{item:"Sourdough bread",qty:"2 slices"},{item:"Avocado",qty:"1"},{item:"Lemon",qty:"½"},{item:"Chilli flakes",qty:"pinch"},{item:"Sea salt",qty:"pinch"}],instructions:"Toast bread, mash avocado with lemon and salt, spread and top with chilli flakes."},
-  {id:2,name:"Pasta Primavera",tags:["dinner","vegetarian"],servings:2,ingredients:[{item:"Pasta",qty:"300g"},{item:"Zucchini",qty:"1"},{item:"Cherry tomatoes",qty:"150g"},{item:"Parmesan",qty:"50g"},{item:"Olive oil",qty:"2 tbsp"},{item:"Garlic",qty:"3 cloves"}],instructions:"Cook pasta. Sauté garlic and veg in olive oil 5 mins. Toss with pasta and parmesan."},
-  {id:3,name:"Greek Salad",tags:["lunch","quick","vegetarian"],servings:2,ingredients:[{item:"Cucumber",qty:"1"},{item:"Tomatoes",qty:"3"},{item:"Feta",qty:"100g"},{item:"Olives",qty:"50g"},{item:"Red onion",qty:"½"},{item:"Olive oil",qty:"3 tbsp"}],instructions:"Chop all veg, combine with olives and feta, dress with olive oil and oregano."},
-  {id:4,name:"Chicken Stir-Fry",tags:["dinner","protein"],servings:2,ingredients:[{item:"Chicken breast",qty:"400g"},{item:"Bell peppers",qty:"2"},{item:"Broccoli",qty:"200g"},{item:"Soy sauce",qty:"3 tbsp"},{item:"Sesame oil",qty:"1 tbsp"},{item:"Rice",qty:"300g"}],instructions:"Cook rice. Stir-fry chicken until golden, add veg and sauce, cook 5 mins more."},
-  {id:5,name:"Overnight Oats",tags:["breakfast","prep-ahead"],servings:2,ingredients:[{item:"Rolled oats",qty:"80g"},{item:"Milk",qty:"200ml"},{item:"Honey",qty:"1 tbsp"},{item:"Chia seeds",qty:"1 tbsp"},{item:"Berries",qty:"handful"}],instructions:"Mix oats, milk, honey and chia. Refrigerate overnight. Top with berries to serve."},
-  {id:6,name:"Lentil Soup",tags:["lunch","dinner","vegan"],servings:4,ingredients:[{item:"Red lentils",qty:"250g"},{item:"Onion",qty:"1"},{item:"Carrots",qty:"2"},{item:"Canned tomatoes",qty:"400g"},{item:"Cumin",qty:"1 tsp"},{item:"Vegetable stock",qty:"1L"}],instructions:"Sauté onion and carrots. Add lentils, tomatoes and stock. Simmer 25 mins."},
-  {id:7,name:"Salmon & Veg",tags:["dinner","protein","healthy"],servings:2,ingredients:[{item:"Salmon fillet",qty:"2 pieces"},{item:"Asparagus",qty:"200g"},{item:"Lemon",qty:"1"},{item:"Butter",qty:"30g"},{item:"New potatoes",qty:"300g"}],instructions:"Roast potatoes 30 mins. Pan-fry salmon 4 mins each side with butter and lemon. Steam asparagus."},
-  {id:8,name:"Veggie Omelette",tags:["breakfast","quick","protein"],servings:2,ingredients:[{item:"Eggs",qty:"3"},{item:"Mushrooms",qty:"100g"},{item:"Spinach",qty:"handful"},{item:"Cheddar",qty:"30g"},{item:"Butter",qty:"10g"}],instructions:"Beat eggs, cook in butter. Add mushrooms and spinach, fold with cheese."},
+  {id:1,name:"Avocado Toast",category:"Breakfast",tags:["breakfast","quick"],servings:2,ingredients:[{item:"Sourdough bread",qty:"2 slices"},{item:"Avocado",qty:"1"},{item:"Lemon",qty:"half"},{item:"Chilli flakes",qty:"pinch"},{item:"Sea salt",qty:"pinch"}],instructions:"Toast bread until golden. Mash avocado with lemon juice and salt. Spread onto toast and top with chilli flakes."},
+  {id:2,name:"Pasta Primavera",category:"Dinner",tags:["dinner","vegetarian"],servings:2,ingredients:[{item:"Pasta",qty:"300g"},{item:"Zucchini",qty:"1"},{item:"Cherry tomatoes",qty:"150g"},{item:"Parmesan",qty:"50g"},{item:"Olive oil",qty:"2 tbsp"},{item:"Garlic",qty:"3 cloves"}],instructions:"Bring a large pot of salted water to boil. Cook pasta until al dente. Saute garlic in olive oil for 1 min. Add chopped veg and cook 5 mins. Toss with drained pasta and parmesan. Season to taste."},
+  {id:3,name:"Greek Salad",category:"Lunch",tags:["lunch","quick","vegetarian"],servings:2,ingredients:[{item:"Cucumber",qty:"1"},{item:"Tomatoes",qty:"3"},{item:"Feta",qty:"100g"},{item:"Olives",qty:"50g"},{item:"Red onion",qty:"half"},{item:"Olive oil",qty:"3 tbsp"}],instructions:"Chop cucumber and tomatoes into large chunks. Slice the red onion thinly. Combine all veg in a bowl with olives. Crumble feta on top and dress with olive oil and dried oregano."},
+  {id:4,name:"Chicken Stir-Fry",category:"Dinner",tags:["dinner","protein"],servings:2,ingredients:[{item:"Chicken breast",qty:"400g"},{item:"Bell peppers",qty:"2"},{item:"Broccoli",qty:"200g"},{item:"Soy sauce",qty:"3 tbsp"},{item:"Sesame oil",qty:"1 tbsp"},{item:"Rice",qty:"300g"}],instructions:"Cook rice according to packet instructions. Slice chicken into strips. Heat a wok until very hot. Stir-fry chicken until golden about 4 mins. Add veg and sauce. Cook 5 mins more stirring constantly."},
+  {id:5,name:"Overnight Oats",category:"Breakfast",tags:["breakfast","prep-ahead"],servings:2,ingredients:[{item:"Rolled oats",qty:"80g"},{item:"Milk",qty:"200ml"},{item:"Honey",qty:"1 tbsp"},{item:"Chia seeds",qty:"1 tbsp"},{item:"Berries",qty:"handful"}],instructions:"Combine oats, milk, honey and chia seeds in a jar. Stir well to combine. Seal and refrigerate overnight. In the morning give it a stir and top with fresh berries."},
+  {id:6,name:"Lentil Soup",category:"Lunch",tags:["lunch","dinner","vegan"],servings:4,ingredients:[{item:"Red lentils",qty:"250g"},{item:"Onion",qty:"1"},{item:"Carrots",qty:"2"},{item:"Canned tomatoes",qty:"400g"},{item:"Cumin",qty:"1 tsp"},{item:"Vegetable stock",qty:"1L"}],instructions:"Dice onion and carrots. Saute in oil until softened about 5 mins. Add cumin and stir for 30 seconds. Add lentils, tomatoes and stock. Bring to boil then simmer 25 mins until lentils are soft. Season well."},
+  {id:7,name:"Salmon and Veg",category:"Dinner",tags:["dinner","protein","healthy"],servings:2,ingredients:[{item:"Salmon fillet",qty:"2 pieces"},{item:"Asparagus",qty:"200g"},{item:"Lemon",qty:"1"},{item:"Butter",qty:"30g"},{item:"New potatoes",qty:"300g"}],instructions:"Preheat oven to 200C. Roast potatoes with olive oil for 30 mins. Pan-fry salmon in butter over medium-high heat for 4 mins each side. Squeeze lemon over the fish. Steam asparagus for 3 mins and serve alongside."},
+  {id:8,name:"Veggie Omelette",category:"Breakfast",tags:["breakfast","quick","protein"],servings:2,ingredients:[{item:"Eggs",qty:"3"},{item:"Mushrooms",qty:"100g"},{item:"Spinach",qty:"handful"},{item:"Cheddar",qty:"30g"},{item:"Butter",qty:"10g"}],instructions:"Beat eggs with a pinch of salt. Melt butter in a non-stick pan over medium heat. Pour in eggs and let set slightly. Add sliced mushrooms and spinach. Fold omelette and top with grated cheddar."},
+  {id:9,name:"Chocolate Mousse",category:"Dessert",tags:["dessert"],servings:4,ingredients:[{item:"Dark chocolate",qty:"200g"},{item:"Eggs",qty:"4"},{item:"Caster sugar",qty:"2 tbsp"},{item:"Double cream",qty:"100ml"}],instructions:"Melt chocolate in a bowl over hot water. Separate eggs and whisk yolks with sugar until pale. Whip cream to soft peaks. Whisk egg whites to stiff peaks. Fold chocolate into yolks then fold in cream and whites."},
+  {id:10,name:"Trail Mix",category:"Snack",tags:["snack","quick","healthy"],servings:4,ingredients:[{item:"Mixed nuts",qty:"100g"},{item:"Dried fruit",qty:"50g"},{item:"Dark chocolate chips",qty:"30g"},{item:"Seeds",qty:"30g"}],instructions:"Combine all ingredients in a bowl. Mix well. Store in an airtight container for up to 2 weeks."},
 ];
- 
-function emptyPlan(){const p={};for(let w=1;w<=2;w++)for(let d=0;d<7;d++)for(const m of MEALS)p[`${w}-${d}-${m}`]=null;return p;}
- 
-let state={plan:emptyPlan(),recipes:DEFAULT_RECIPES,week:1,view:"planner",filterTag:"all",shopWeeks:[1,2],checked:{},eatingOut:{},pantry:[],extraShopItems:[],syncUrl:"",apiKey:""};
- 
-function load(){try{const s=localStorage.getItem("deux-semaines-v3");if(s){const d=JSON.parse(s);Object.assign(state,d);if(!state.pantry)state.pantry=[];if(!state.extraShopItems)state.extraShopItems=[];if(!state.eatingOut)state.eatingOut={}}}catch{}}
-function save(){try{localStorage.setItem("deux-semaines-v3",JSON.stringify(state));}catch{}if(state.syncUrl)syncToSheet();}
- 
+
+function emptyPlan(){const p={};for(let w=1;w<=2;w++)for(let d=0;d<7;d++)for(const m of MEALS)p[w+"-"+d+"-"+m]=null;return p;}
+let state={plan:emptyPlan(),recipes:DEFAULT_RECIPES,week:1,view:"planner",recipeCat:"All",shopWeeks:[1,2],checked:{},eatingOut:{},pantry:[],freezer:[],extraShopItems:[],syncUrl:"",apiKey:""};
+let moveSource=null;
+function load(){try{const s=localStorage.getItem("deux-semaines-v4");if(s){const d=JSON.parse(s);Object.assign(state,d);["pantry","freezer","extraShopItems"].forEach(k=>{if(!state[k])state[k]=[];});if(!state.eatingOut)state.eatingOut={};}}catch(e){}}
+function save(){try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}if(state.syncUrl)syncToSheet();}
 load();
- 
 function getRecipe(id){return state.recipes.find(r=>r.id===id);}
-function allTags(){return[...new Set(state.recipes.flatMap(r=>r.tags))];}
-function tagChip(t){return`<span class="chip" style="background:${TAG_COLORS[t]||'#e0d8cc'}">${t}</span>`;}
- 
-function getAisle(itemName){
-  const n=itemName.toLowerCase();
-  for(const[aisle,keywords]of Object.entries(AISLE_MAP)){
-    if(aisle==="Other")continue;
-    if(keywords.some(k=>n.includes(k)))return aisle;
-  }
-  return "Other";
-}
- 
+function tagChip(t){return'<span class="chip" style="background:'+(TAG_COLORS[t]||"#e0d8cc")+'">'+t+'</span>';}
+function getAisle(n){n=n.toLowerCase();for(const[a,ks]of Object.entries(AISLE_MAP)){if(a==="Other")continue;if(ks.some(k=>n.includes(k)))return a;}return"Other";}
+
 function showView(v){
-  state.view=v;
-  document.getElementById('content').scrollTop=0;
-  ['planner','recipes','shopping','pantry','settings'].forEach(x=>{
-    document.getElementById('view-'+x).style.display=x===v?'':'none';
-    const nb=document.getElementById('nav-'+x);
-    if(nb)nb.classList.toggle('active',x===v);
+  state.view=v;document.getElementById("content").scrollTop=0;
+  ["planner","recipes","shopping","freezer","pantry","settings"].forEach(x=>{
+    document.getElementById("view-"+x).style.display=x===v?"":"none";
+    const nb=document.getElementById("nav-"+x);if(nb)nb.classList.toggle("active",x===v);
   });
-  const fabWrap=document.getElementById('fab-wrap');
-  if(fabWrap)fabWrap.style.display=v==='recipes'?'flex':'none';
-  if(v==='planner')renderPlanner();
-  if(v==='recipes')renderRecipes();
-  if(v==='shopping')renderShopping();
-  if(v==='pantry')renderPantry();
-  if(v==='settings')renderSettings();
+  const fw=document.getElementById("fab-wrap");if(fw)fw.style.display=v==="recipes"?"flex":"none";
+  if(v==="planner")renderPlanner();
+  if(v==="recipes")renderRecipes();
+  if(v==="shopping")renderShopping();
+  if(v==="freezer")renderFreezer();
+  if(v==="pantry")renderPantry();
+  if(v==="settings")renderSettings();
 }
- 
 function setWeek(w){state.week=w;renderPlanner();}
- 
-// ── PLANNER ──────────────────────────────────────────────────────────────
+
 function renderPlanner(){
   const w=state.week;
-  let html=`<div class="week-tabs">
-    <button class="week-tab ${w===1?'active':''}" onclick="setWeek(1)">Week 1</button>
-    <button class="week-tab ${w===2?'active':''}" onclick="setWeek(2)">Week 2</button>
-  </div>`;
+  let html='<div class="week-tabs"><button class="week-tab '+(w===1?"active":"")+ '" onclick="setWeek(1)">Week 1</button><button class="week-tab '+(w===2?"active":"")+ '" onclick="setWeek(2)">Week 2</button></div>';
   for(let d=0;d<7;d++){
-    const eoKey=`${w}-${d}`;
-    const isEatingOut=!!state.eatingOut[eoKey];
-    html+=`<div class="day-card">
-      <div class="day-header">
-        <span class="day-name">${DAYS_FULL[d]}</span>
-        ${isEatingOut
-          ?`<span class="eating-out-badge">🍽 Eating out</span><button class="eating-out-btn" onclick="toggleEatingOut('${eoKey}')">Cancel</button>`
-          :`<button class="eating-out-btn" onclick="toggleEatingOut('${eoKey}')">🍽 Eating out?</button>`}
-      </div>`;
-    if(isEatingOut){
-      html+=`<div style="padding:16px;text-align:center;font-size:13px;color:var(--faint);font-style:italic">No cooking tonight!</div>`;
-    } else {
+    const eoKey=w+"-"+d;const isEO=!!state.eatingOut[eoKey];
+    html+='<div class="day-card"><div class="day-header"><span class="day-name">'+DAYS_FULL[d]+'</span>';
+    if(isEO)html+='<span class="eating-out-badge">Eating out</span><button class="eating-out-btn" onclick="toggleEatingOut(\''+eoKey+'\')">Cancel</button>';
+    else html+='<button class="eating-out-btn" onclick="toggleEatingOut(\''+eoKey+'\')">Eating out?</button>';
+    html+='</div>';
+    if(isEO){html+='<div style="padding:14px;text-align:center;font-size:13px;color:var(--faint);font-style:italic">No cooking tonight!</div>';}
+    else{
       MEALS.forEach(meal=>{
-        const cell=`${w}-${d}-${meal}`;
-        const rid=state.plan[cell];
-        const recipe=rid?getRecipe(rid):null;
-        const cls=meal.toLowerCase();
-        html+=`<div class="meal-row">
-          <div class="meal-tag ${cls}">${meal}</div>
-          <div class="meal-cell ${recipe?'filled':''}" onclick="openAssign('${cell}','${meal}','${DAYS_FULL[d]}')">
-            <div class="meal-cell-inner">`;
-        if(recipe){
-          html+=`<div class="cell-name">${recipe.name}</div>
-            <div class="cell-tags">${recipe.tags.slice(0,4).map(t=>`<span class="tag-dot" style="background:${TAG_COLORS[t]||'#ccc'}" title="${t}"></span>`).join('')}</div>`;
-        } else {
-          html+=`<div class="cell-empty">Tap to add…</div>`;
-        }
-        html+=`</div>`;
-        if(recipe){
-          html+=`<div class="cell-actions">
-            <button class="cell-icon-btn" title="View recipe" onclick="event.stopPropagation();openRecipe(${recipe.id})">👁</button>
-            <button class="cell-icon-btn" title="Remove" onclick="event.stopPropagation();clearCell('${cell}')">✕</button>
-          </div>`;
-        }
-        html+=`</div></div>`;
+        const cell=w+"-"+d+"-"+meal;const rid=state.plan[cell];const recipe=rid?getRecipe(rid):null;
+        const isSrc=moveSource&&moveSource.cell===cell;const isTgt=moveSource&&moveSource.cell!==cell;
+        html+='<div class="meal-row"><div class="meal-tag '+MEAL_CSS[meal]+'">'+meal+'</div>';
+        html+='<div class="meal-cell '+(recipe?"filled ":"")+(isSrc?"move-source ":"")+(isTgt?"move-target ":"")+'" onclick="'+(moveSource?"doMove('"+cell+"')":"openAssign('"+cell+"','"+meal+"','"+DAYS_FULL[d]+"')")+'"><div class="meal-cell-inner">';
+        if(recipe){html+='<div class="cell-name">'+recipe.name+'</div><div class="cell-tags">'+recipe.tags.slice(0,4).map(t=>'<span class="tag-dot" style="background:'+(TAG_COLORS[t]||"#ccc")+'"></span>').join("")+'</div>';}
+        else{html+='<div class="cell-empty">'+(moveSource?"Tap to place here":"Tap to add...")+'</div>';}
+        html+='</div>';
+        if(recipe&&!moveSource){html+='<div class="cell-actions"><button class="cell-icon-btn" onclick="event.stopPropagation();openRecipe('+recipe.id+')">&#128065;</button><button class="cell-icon-btn" onclick="event.stopPropagation();startMove(\''+cell+'\','+recipe.id+')">&#8597;</button><button class="cell-icon-btn" onclick="event.stopPropagation();clearCell(\''+cell+'\')">&#10005;</button></div>';}
+        html+='</div></div>';
       });
     }
-    html+=`</div>`;
+    html+='</div>';
   }
-  document.getElementById('view-planner').innerHTML=html;
+  document.getElementById("view-planner").innerHTML=html;
 }
- 
 function clearCell(cell){state.plan[cell]=null;save();renderPlanner();}
-function toggleEatingOut(key){
-  if(state.eatingOut[key])delete state.eatingOut[key];
-  else state.eatingOut[key]=true;
-  save();renderPlanner();
-}
- 
-// ── RECIPES ──────────────────────────────────────────────────────────────
+function toggleEatingOut(key){if(state.eatingOut[key])delete state.eatingOut[key];else state.eatingOut[key]=true;save();renderPlanner();}
+function startMove(cell,rid){moveSource={cell,rid};const r=getRecipe(rid);document.getElementById("move-banner").style.display="flex";document.getElementById("move-banner-text").textContent='Moving "'+r.name+'" \u2014 tap any slot';renderPlanner();}
+function cancelMove(){moveSource=null;document.getElementById("move-banner").style.display="none";renderPlanner();}
+function doMove(targetCell){if(!moveSource)return;const ex=state.plan[targetCell];state.plan[targetCell]=moveSource.rid;state.plan[moveSource.cell]=ex||null;moveSource=null;document.getElementById("move-banner").style.display="none";save();renderPlanner();}
+
 function renderRecipes(){
-  const ft=state.filterTag;
-  const tags=allTags();
-  let html=`<div class="filter-bar">
-    <button class="filter-btn ${ft==='all'?'active':''}" onclick="setFilter('all')">All</button>
-    ${tags.map(t=>`<button class="filter-btn ${ft===t?'active':''}" style="${ft===t?`background:${TAG_COLORS[t]||'#2c2416'};color:#2c2416`:''}" onclick="setFilter('${t}')">${t}</button>`).join('')}
-  </div><div class="recipe-grid">`;
-  const filtered=ft==='all'?state.recipes:state.recipes.filter(r=>r.tags.includes(ft));
+  const cat=state.recipeCat||"All";
+  let html='<div class="cat-tabs">'+RECIPE_CATS.map(c=>'<button class="cat-tab '+(cat===c?"active":"")+'" onclick="setRecipeCat(\''+c+'\')">'+c+'</button>').join("")+'</div><div class="recipe-grid">';
+  const filtered=cat==="All"?state.recipes:cat==="Other"?state.recipes.filter(r=>!RECIPE_CATS.slice(1,-1).includes(r.category||"")):state.recipes.filter(r=>(r.category||"")===cat);
+  if(!filtered.length)html+='<div class="empty-state">No '+cat.toLowerCase()+' recipes yet.</div>';
   filtered.forEach(r=>{
-    html+=`<div class="recipe-card">
-      <div class="recipe-card-top">
-        <div class="recipe-card-title"><span>${r.name}</span>
-          <div style="display:flex;gap:6px">
-            <button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="openRecipe(${r.id})">👁</button>
-            <button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="deleteRecipe(${r.id})">🗑</button>
-          </div>
-        </div>
-        <div class="tags-row">${r.tags.map(tagChip).join('')}</div>
-      </div>
-      <div class="recipe-card-body">
-        ${r.ingredients.slice(0,3).map(i=>`<div class="recipe-ing"><span class="qty">${i.qty}</span> ${i.item}</div>`).join('')}
-        ${r.ingredients.length>3?`<div class="recipe-more">+${r.ingredients.length-3} more…</div>`:''}
-      </div>
-    </div>`;
+    html+='<div class="recipe-card"><div class="recipe-card-top"><div class="recipe-card-title"><span>'+r.name+'</span><div style="display:flex;gap:6px"><button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="openRecipe('+r.id+')">&#128065;</button><button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="deleteRecipe('+r.id+')">&#128465;</button></div></div>';
+    html+='<div style="font-size:11px;color:var(--faint);margin-top:3px">'+(r.category||"Uncategorised")+'</div><div class="tags-row">'+r.tags.map(tagChip).join("")+'</div></div>';
+    html+='<div class="recipe-card-body">'+r.ingredients.slice(0,3).map(i=>'<div class="recipe-ing"><span class="qty">'+i.qty+'</span> '+i.item+'</div>').join("")+(r.ingredients.length>3?'<div class="recipe-more">+'+(r.ingredients.length-3)+' more...</div>':'')+'</div></div>';
   });
-  html+=`</div>`;
-  document.getElementById('view-recipes').innerHTML=html;
-  let fabWrap=document.getElementById('fab-wrap');
-  if(!fabWrap){
-    fabWrap=document.createElement('div');
-    fabWrap.id='fab-wrap';fabWrap.className='fab-wrap';
-    fabWrap.innerHTML=`
-      <div id="fab-labels" style="display:none;flex-direction:column;align-items:flex-end;gap:10px">
-        <button onclick="openImportRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">📸</span>Import from Instagram</button>
-        <button onclick="openNewRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">✏️</span>Add manually</button>
-      </div>
-      <button id="fab-main" onclick="toggleFab()" style="background:var(--ink);color:var(--bg);border:none;border-radius:50%;width:52px;height:52px;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;transition:transform .2s">+</button>`;
-    document.body.appendChild(fabWrap);
-  }
-  fabWrap.style.display='flex';
+  html+='</div>';
+  document.getElementById("view-recipes").innerHTML=html;
+  let fw=document.getElementById("fab-wrap");
+  if(!fw){fw=document.createElement("div");fw.id="fab-wrap";fw.className="fab-wrap";fw.innerHTML='<div id="fab-labels" style="display:none;flex-direction:column;align-items:flex-end;gap:10px"><button onclick="openImportRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">&#128248;</span>Import from Instagram</button><button onclick="openNewRecipe()" style="display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:none;border-radius:24px;padding:10px 16px 10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2)"><span style="font-size:18px">&#9999;&#65039;</span>Add manually</button></div><button id="fab-main" onclick="toggleFab()" style="background:var(--ink);color:var(--bg);border:none;border-radius:50%;width:52px;height:52px;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;transition:transform .2s">+</button>';document.body.appendChild(fw);}
+  fw.style.display="flex";
 }
- 
-function setFilter(t){state.filterTag=t;renderRecipes();}
- 
-// ── RECIPE DETAIL with SERVING SCALER ────────────────────────────────────
+function setRecipeCat(c){state.recipeCat=c;renderRecipes();}
+
 function openRecipe(id,servings){
   const r=getRecipe(id);if(!r)return;
-  const base=r.servings||2;
-  const cur=servings||base;
-  const ratio=cur/base;
-  function scaleQty(qty){
-    if(!qty)return'';
-    const m=qty.match(/^(\d+\.?\d*)/);
-    if(!m)return qty;
-    const n=parseFloat(m[1])*ratio;
-    const rounded=Math.round(n*4)/4;
-    return qty.replace(/^(\d+\.?\d*)/,rounded%1===0?rounded:rounded.toFixed(1));
-  }
-  let body=`
-    <div class="scaler-row">
-      <span class="scaler-label">Servings</span>
-      <button class="scaler-btn" onclick="openRecipe(${id},${Math.max(1,cur-1)})">−</button>
-      <span class="scaler-val">${cur}</span>
-      <button class="scaler-btn" onclick="openRecipe(${id},${cur+1})">+</button>
-    </div>
-    <div class="tags-row" style="margin-bottom:16px">${r.tags.map(tagChip).join('')}</div>
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Ingredients</div>`;
+  const base=r.servings||2;const cur=servings||base;const ratio=cur/base;
+  function scaleQty(qty){if(!qty)return"";const m=qty.match(/^(\d+\.?\d*)/);if(!m)return qty;const n=parseFloat(m[1])*ratio;const rn=Math.round(n*4)/4;return qty.replace(/^(\d+\.?\d*)/,rn%1===0?rn:rn.toFixed(1));}
+  let body='<div style="font-size:12px;color:var(--faint);margin-bottom:12px">'+(r.category||"Recipe")+'</div>';
+  body+='<div class="scaler-row"><span class="scaler-label">Servings</span><button class="scaler-btn" onclick="openRecipe('+id+','+(Math.max(1,cur-1))+')">&#8722;</button><span class="scaler-val">'+cur+'</span><button class="scaler-btn" onclick="openRecipe('+id+','+(cur+1)+')">+</button></div>';
+  body+='<div class="tags-row" style="margin-bottom:16px">'+r.tags.map(tagChip).join("")+'</div>';
+  body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Ingredients</div>';
   r.ingredients.forEach(i=>{
-    const inPantry=state.pantry.some(p=>p.item.toLowerCase()===i.item.toLowerCase());
-    body+=`<div class="detail-row">
-      <span>${i.item}${inPantry?'<span class="pantry-badge">In pantry</span>':''}</span>
-      <span class="detail-qty">${scaleQty(i.qty)}</span>
-    </div>`;
+    const inP=state.pantry.some(p=>p.item.toLowerCase()===i.item.toLowerCase());
+    const inF=state.freezer.some(f=>f.name.toLowerCase().includes(i.item.toLowerCase()));
+    body+='<div class="detail-row"><span>'+i.item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+'</span><span class="detail-qty">'+scaleQty(i.qty)+'</span></div>';
   });
   if(r.instructions){
     const steps=r.instructions.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>2);
-    body+=`<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 10px">Method</div>`;
-    steps.forEach((step,i)=>{
-      body+=`<div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start">
-        <span style="flex-shrink:0;width:24px;height:24px;background:var(--ink);color:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">${i+1}</span>
-        <span style="font-size:14px;line-height:1.65;color:var(--ink2)">${step.trim()}</span>
-      </div>`;
-    });
+    body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 10px">Method</div>';
+    steps.forEach((step,i)=>{body+='<div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start"><span style="flex-shrink:0;width:24px;height:24px;background:var(--ink);color:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">'+(i+1)+'</span><span style="font-size:14px;line-height:1.65;color:var(--ink2)">'+step.trim()+'</span></div>';});
   }
-  body+=`<div style="height:8px"></div>`;
+  // Add ingredient row
+  body+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--warm)">';
+  body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Add Ingredient</div>';
+  body+='<div style="display:flex;gap:8px;margin-bottom:8px">';
+  body+='<input type="text" id="add-ing-item" placeholder="Ingredient" style="flex:3;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none">';
+  body+='<input type="text" id="add-ing-qty" placeholder="Qty" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none">';
+  body+='</div>';
+  body+='<button onclick="saveIngredientToRecipe('+id+','+cur+')" style="width:100%;padding:11px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">Save to Recipe</button>';
+  body+='</div>';
+  body+='<button onclick="addToFreezerFromRecipe('+id+')" style="width:100%;margin-top:10px;padding:11px;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">&#129482; Add to Freezer</button><div style="height:8px"></div>';
   openModal(r.name,body);
 }
- 
-function deleteRecipe(id){
-  if(!confirm('Delete this recipe?'))return;
-  state.recipes=state.recipes.filter(r=>r.id!==id);
-  Object.keys(state.plan).forEach(k=>{if(state.plan[k]===id)state.plan[k]=null;});
-  save();renderRecipes();
-}
- 
-// ── SHOPPING ─────────────────────────────────────────────────────────────
-function renderShopping(){
-  const fabWrap=document.getElementById('fab-wrap');
-  if(fabWrap)fabWrap.style.display='none';
-  const sw=state.shopWeeks;
-  let html=`<div class="week-tabs" style="margin-bottom:16px">
-    ${[1,2].map(w=>`<button class="week-tab ${sw.includes(w)?'active':''}" onclick="toggleShopWeek(${w})">Week ${w}</button>`).join('')}
-    <span class="week-hint">${sw.length===2?'Both weeks':sw.length===1?`Week ${sw[0]} only`:'None'}</span>
-  </div>`;
- 
-  // Extra items input
-  html+=`<div style="margin-bottom:16px">
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Add extra item</div>
-    <div class="extra-add-row">
-      <input type="text" id="extra-item-input" placeholder="e.g. Washing up liquid" onkeydown="if(event.key==='Enter')addExtraItem()">
-      <button onclick="addExtraItem()">+</button>
-    </div>
-  </div>`;
- 
-  // Build ingredient items grouped by aisle
-  const aisleItems={};
-  sw.forEach(w=>{
-    for(let d=0;d<7;d++)for(const m of MEALS){
-      if(state.eatingOut[`${w}-${d}`])continue;
-      const rid=state.plan[`${w}-${d}-${m}`];
-      if(rid){const r=getRecipe(rid);if(r)r.ingredients.forEach(({item,qty})=>{
-        const aisle=getAisle(item);
-        if(!aisleItems[aisle])aisleItems[aisle]=[];
-        const existing=aisleItems[aisle].find(x=>x.item.toLowerCase()===item.toLowerCase());
-        if(existing){existing.uses.push({qty,meal:r.name});}
-        else{aisleItems[aisle].push({item,uses:[{qty,meal:r.name}]});}
-      });}
-    }
-  });
- 
-  // Add extra items to "Other"
-  if(state.extraShopItems&&state.extraShopItems.length){
-    if(!aisleItems["Extra"])aisleItems["Extra"]=[];
-    state.extraShopItems.forEach(ei=>{
-      aisleItems["Extra"].push({item:ei,uses:[{qty:'',meal:'extra'}],isExtra:true});
-    });
-  }
- 
-  const aisleOrder=["Produce","Meat & Fish","Dairy & Eggs","Bakery","Dry & Tins","Sauces & Oils","Spices","Frozen","Extra","Other"];
-  const hasItems=Object.values(aisleItems).some(a=>a.length>0);
- 
-  if(!hasItems){
-    html+=`<div class="empty-state">No meals planned yet —<br>head to the Planner to assign recipes!</div>`;
-  } else {
-    aisleOrder.forEach(aisle=>{
-      const items=aisleItems[aisle];
-      if(!items||!items.length)return;
-      html+=`<div class="shop-section"><div class="shop-section-title">${aisle}</div>`;
-      items.forEach(({item,uses,isExtra})=>{
-        const ck=!!state.checked[item];
-        const inPantry=state.pantry.some(p=>p.item.toLowerCase()===item.toLowerCase());
-        const safeId=item.replace(/[^a-z0-9]/gi,'_');
-        html+=`<div class="shop-item ${ck?'checked':''}" id="si-${safeId}">
-          <input type="checkbox" ${ck?'checked':''} onchange="toggleCheck('${item.replace(/'/g,"\\'")}',this.checked)">
-          <div style="flex:1">
-            <div class="shop-name">${item}${inPantry?'<span class="pantry-badge">In pantry</span>':''}</div>
-            ${!isExtra?`<div class="shop-meta">${uses.map(u=>`${u.qty} for <em>${u.meal}</em>`).join(' · ')}</div>`:''}
-          </div>
-          ${isExtra?`<button onclick="removeExtraItem('${item.replace(/'/g,"\\'")}') "style="background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:2px 4px">✕</button>`:''}
-        </div>`;
-      });
-      html+=`</div>`;
-    });
-    html+=`<button onclick="clearChecked()" style="background:none;border:none;color:var(--faint);font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;font-style:italic">Clear ticked items</button>`;
-  }
- 
-  document.getElementById('view-shopping').innerHTML=html;
-}
- 
-function addExtraItem(){
-  const input=document.getElementById('extra-item-input');
-  if(!input)return;
-  const val=input.value.trim();
-  if(!val)return;
-  if(!state.extraShopItems)state.extraShopItems=[];
-  state.extraShopItems.push(val);
-  input.value='';
-  save();renderShopping();
-}
-function removeExtraItem(item){
-  state.extraShopItems=state.extraShopItems.filter(x=>x!==item);
-  save();renderShopping();
-}
-function toggleShopWeek(w){const ws=state.shopWeeks;state.shopWeeks=ws.includes(w)?ws.filter(x=>x!==w):[...ws,w];save();renderShopping();}
-function toggleCheck(item,val){
-  if(val)state.checked[item]=true;else delete state.checked[item];
+
+function saveIngredientToRecipe(id, servings){
+  const itemEl=document.getElementById("add-ing-item");
+  const qtyEl=document.getElementById("add-ing-qty");
+  if(!itemEl)return;
+  const item=itemEl.value.trim();
+  const qty=qtyEl?qtyEl.value.trim():"";
+  if(!item){itemEl.style.borderColor="#e57373";itemEl.focus();return;}
+  const r=getRecipe(id);if(!r)return;
+  r.ingredients.push({item,qty});
   save();
-  const safeId=item.replace(/[^a-z0-9]/gi,'_');
-  const el=document.getElementById('si-'+safeId);
-  if(el)el.classList.toggle('checked',val);
+  // re-open the recipe at same servings so user sees the new ingredient
+  openRecipe(id, servings);
 }
-function clearChecked(){state.checked={};save();renderShopping();}
- 
-// ── PANTRY ────────────────────────────────────────────────────────────────
-function renderPantry(){
-  let html=`<h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px">Pantry</h2>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Items here show an "In pantry" badge on your shopping list and recipe view.</p>
-    <div class="extra-add-row" style="margin-bottom:16px">
-      <input type="text" id="pantry-input" placeholder="e.g. Olive oil, Soy sauce…" onkeydown="if(event.key==='Enter')addPantryItem()">
-      <button onclick="addPantryItem()">+</button>
-    </div>`;
-  if(!state.pantry.length){
-    html+=`<div class="empty-state">No pantry items yet.<br>Add staples you always have in stock.</div>`;
-  } else {
-    state.pantry.forEach((p,i)=>{
-      html+=`<div class="pantry-item">
-        <span class="pantry-name">${p.item}</span>
-        <button class="pantry-del" onclick="removePantryItem(${i})">✕</button>
-      </div>`;
+function deleteRecipe(id){if(!confirm("Delete this recipe?"))return;state.recipes=state.recipes.filter(r=>r.id!==id);Object.keys(state.plan).forEach(k=>{if(state.plan[k]===id)state.plan[k]=null;});save();renderRecipes();}
+
+function renderShopping(){
+  const fw=document.getElementById("fab-wrap");if(fw)fw.style.display="none";
+  const sw=state.shopWeeks;
+  let html='<div class="week-tabs" style="margin-bottom:16px">'+[1,2].map(w=>'<button class="week-tab '+(sw.includes(w)?"active":"")+'" onclick="toggleShopWeek('+w+')">Week '+w+'</button>').join("")+'<span class="week-hint">'+(sw.length===2?"Both weeks":sw.length===1?"Week "+sw[0]+" only":"None")+'</span></div>';
+  html+='<div class="extra-add-row"><input type="text" id="extra-item-input" placeholder="Add extra item..." onkeydown="if(event.key===\'Enter\')addExtraItem()"><button onclick="addExtraItem()">+</button></div>';
+  const ai={};
+  sw.forEach(w=>{for(let d=0;d<7;d++)for(const m of MEALS){if(state.eatingOut[w+"-"+d])continue;const rid=state.plan[w+"-"+d+"-"+m];if(rid){const r=getRecipe(rid);if(r)r.ingredients.forEach(({item,qty})=>{const a=getAisle(item);if(!ai[a])ai[a]=[];const ex=ai[a].find(x=>x.item.toLowerCase()===item.toLowerCase());if(ex)ex.uses.push({qty,meal:r.name});else ai[a].push({item,uses:[{qty,meal:r.name}]});});}}});
+  if(state.extraShopItems&&state.extraShopItems.length){if(!ai["Extra"])ai["Extra"]=[];state.extraShopItems.forEach(ei=>ai["Extra"].push({item:ei,uses:[],isExtra:true}));}
+  const order=["Produce","Meat & Fish","Dairy & Eggs","Bakery","Dry & Tins","Sauces & Oils","Spices","Frozen","Extra","Other"];
+  const hasItems=Object.values(ai).some(a=>a.length>0);
+  if(!hasItems){html+='<div class="empty-state">No meals planned yet!</div>';}
+  else{
+    order.forEach(aisle=>{const items=ai[aisle];if(!items||!items.length)return;
+      html+='<div class="shop-section"><div class="shop-section-title">'+aisle+'</div>';
+      items.forEach(({item,uses,isExtra})=>{
+        const ck=!!state.checked[item];const inP=state.pantry.some(p=>p.item.toLowerCase()===item.toLowerCase());const inF=state.freezer.some(f=>f.name.toLowerCase().includes(item.toLowerCase())&&f.portions>0);
+        const sid=item.replace(/[^a-z0-9]/gi,"_");
+        html+='<div class="shop-item '+(ck?"checked":"")+'" id="si-'+sid+'"><input type="checkbox" '+(ck?"checked":"")+ ' onchange="toggleCheck(\''+item.replace(/'/g,"\\'")+"',this.checked)\"><div style=\"flex:1\"><div class=\"shop-name\">"+item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+"</div>"+(!isExtra&&uses.length?'<div class="shop-meta">'+uses.map(u=>u.qty+" for <em>"+u.meal+"</em>").join(" \u00b7 ")+"</div>":"")+"</div>"+(isExtra?'<button onclick="removeExtraItem(\''+item.replace(/'/g,"\\'")+"')\"+style=\"background:none;border:none;cursor:pointer;font-size:16px;color:#ccc\">&#10005;</button>":"")+"</div>";
+      });
+      html+='</div>';
     });
+    html+='<button onclick="clearChecked()" style="background:none;border:none;color:var(--faint);font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;font-style:italic">Clear ticked items</button>';
   }
-  document.getElementById('view-pantry').innerHTML=html;
+  document.getElementById("view-shopping").innerHTML=html;
 }
- 
-function addPantryItem(){
-  const input=document.getElementById('pantry-input');
-  if(!input)return;
-  const val=input.value.trim();
-  if(!val)return;
-  if(!state.pantry)state.pantry=[];
-  state.pantry.push({item:val});
-  input.value='';
-  save();renderPantry();
-}
-function removePantryItem(i){state.pantry.splice(i,1);save();renderPantry();}
- 
-// ── MODALS ────────────────────────────────────────────────────────────────
-function openModal(title,bodyHTML){
-  document.getElementById('modal-title').innerHTML=title;
-  document.getElementById('modal-body').innerHTML=bodyHTML;
-  document.getElementById('modal').style.display='flex';
-  document.getElementById('content').style.overflow='hidden';
-}
-function closeModal(e){
-  if(e&&e.target!==document.getElementById('modal'))return;
-  document.getElementById('modal').style.display='none';
-  document.getElementById('content').style.overflow='';
-}
- 
-function openAssign(cell,meal,dayName){
-  const w=cell.split('-')[0];
-  let body=`<p style="font-size:13px;color:var(--faint);font-style:italic;margin-bottom:14px">${meal} · ${dayName} · Week ${w}</p>`;
-  state.recipes.forEach(r=>{
-    body+=`<button class="assign-btn" onclick="assignRecipe('${cell}',${r.id})">
-      <div class="assign-name">${r.name}</div>
-      <div class="tags-row">${r.tags.map(tagChip).join('')}</div>
-    </button>`;
+function addExtraItem(){const i=document.getElementById("extra-item-input");if(!i)return;const v=i.value.trim();if(!v)return;if(!state.extraShopItems)state.extraShopItems=[];state.extraShopItems.push(v);i.value="";save();renderShopping();}
+function removeExtraItem(item){state.extraShopItems=state.extraShopItems.filter(x=>x!==item);save();renderShopping();}
+function toggleShopWeek(w){const ws=state.shopWeeks;state.shopWeeks=ws.includes(w)?ws.filter(x=>x!==w):[...ws,w];save();renderShopping();}
+function toggleCheck(item,val){if(val)state.checked[item]=true;else delete state.checked[item];save();const sid=item.replace(/[^a-z0-9]/gi,"_");const el=document.getElementById("si-"+sid);if(el)el.classList.toggle("checked",val);}
+function clearChecked(){state.checked={};save();renderShopping();}
+
+function renderFreezer(){
+  let html='<div class="section-h">&#129482; Freezer</div><p class="section-sub">Track meals stored in the freezer.</p>';
+  html+='<button onclick="openAddFreezer()" style="width:100%;padding:12px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:18px">+ Add Freezer Item</button>';
+  if(!state.freezer.length)html+='<div class="empty-state">Nothing in the freezer yet!</div>';
+  else state.freezer.forEach((f,i)=>{
+    html+='<div class="freezer-item"><div class="freezer-item-top"><div><div class="freezer-name">'+f.name+'</div><div class="freezer-meta">'+(f.date?"Frozen "+f.date:"")+(f.notes?" &middot; "+f.notes:"")+'</div></div><button class="pantry-del" onclick="removeFreezerItem('+i+')">&#128465;</button></div>';
+    html+='<div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span style="font-size:13px;color:var(--muted)">Portions:</span><div class="freezer-portions"><button class="freezer-adj" onclick="adjustFreezer('+i+',-1)">&#8722;</button><span>'+f.portions+'</span><button class="freezer-adj" onclick="adjustFreezer('+i+',1)">+</button></div></div></div>';
   });
-  openModal('Choose a recipe',body);
+  document.getElementById("view-freezer").innerHTML=html;
+}
+function openAddFreezer(prefillName){
+  const today=new Date().toISOString().split("T")[0];
+  const body='<label class="field-label" style="margin-top:0">Meal Name</label><input type="text" id="fz-name" placeholder="e.g. Lentil Soup" value="'+(prefillName||"")+'"><label class="field-label">Portions</label><input type="number" id="fz-portions" value="2" min="1" style="width:80px"><label class="field-label">Date Frozen</label><input type="text" id="fz-date" value="'+today+'"><label class="field-label">Notes (optional)</label><input type="text" id="fz-notes" placeholder="e.g. Add chilli sauce"><button class="save-btn" onclick="saveFreezerItem()">Add to Freezer</button><div style="height:4px"></div>';
+  openModal("Add to Freezer",body);
+}
+function saveFreezerItem(){const name=document.getElementById("fz-name").value.trim();if(!name){alert("Please enter a name");return;}const portions=parseInt(document.getElementById("fz-portions").value)||1;const date=document.getElementById("fz-date").value.trim();const notes=document.getElementById("fz-notes").value.trim();state.freezer.push({name,portions,date,notes});save();closeModal();renderFreezer();}
+function addToFreezerFromRecipe(id){const r=getRecipe(id);if(!r)return;closeModal();openAddFreezer(r.name);}
+function adjustFreezer(i,delta){state.freezer[i].portions=Math.max(0,state.freezer[i].portions+delta);save();renderFreezer();}
+function removeFreezerItem(i){if(!confirm("Remove from freezer?"))return;state.freezer.splice(i,1);save();renderFreezer();}
+
+function renderPantry(){
+  let html='<div class="section-h">&#129475; Pantry</div><p class="section-sub">Staples you always have. These show badges on recipes and your shopping list.</p>';
+  html+='<div class="extra-add-row" style="margin-bottom:16px"><input type="text" id="pantry-input" placeholder="e.g. Olive oil, Soy sauce..." onkeydown="if(event.key===\'Enter\')addPantryItem()"><button onclick="addPantryItem()">+</button></div>';
+  if(!state.pantry.length)html+='<div class="empty-state">No pantry items yet.</div>';
+  else state.pantry.forEach((p,i)=>{html+='<div class="pantry-item"><span class="pantry-name">'+p.item+'</span><button class="pantry-del" onclick="removePantryItem('+i+')">&#10005;</button></div>';});
+  document.getElementById("view-pantry").innerHTML=html;
+}
+function addPantryItem(){const i=document.getElementById("pantry-input");if(!i)return;const v=i.value.trim();if(!v)return;if(!state.pantry)state.pantry=[];state.pantry.push({item:v});i.value="";save();renderPantry();}
+function removePantryItem(i){state.pantry.splice(i,1);save();renderPantry();}
+
+function openModal(title,bodyHTML){document.getElementById("modal-title").innerHTML=title;document.getElementById("modal-body").innerHTML=bodyHTML;document.getElementById("modal").style.display="flex";document.getElementById("content").style.overflow="hidden";}
+function closeModal(e){if(e&&e.target!==document.getElementById("modal"))return;document.getElementById("modal").style.display="none";document.getElementById("content").style.overflow="";}
+
+function openAssign(cell,meal,dayName){
+  const w=cell.split("-")[0];
+  let body='<p style="font-size:13px;color:var(--faint);font-style:italic;margin-bottom:14px">'+meal+" \u00b7 "+dayName+" \u00b7 Week "+w+'</p>';
+  const matching=state.recipes.filter(r=>(r.category||"")===meal);
+  const others=state.recipes.filter(r=>(r.category||"")!==meal);
+  const ordered=[...matching,...others];
+  if(!ordered.length)body+='<div class="empty-state">No recipes yet!</div>';
+  ordered.forEach(r=>{
+    const isMatch=(r.category||"")===meal;
+    body+='<button class="assign-btn" onclick="assignRecipe(\''+cell+'\','+r.id+')"><div class="assign-name">'+r.name+(!isMatch?' <span style="font-size:10px;color:var(--faint)">('+( r.category||"Other")+")</span>":"")+'</div><div class="tags-row">'+r.tags.map(tagChip).join("")+'</div></button>';
+  });
+  openModal("Choose a recipe",body);
 }
 function assignRecipe(cell,rid){state.plan[cell]=rid;save();closeModal();renderPlanner();}
- 
-// ── NEW RECIPE ────────────────────────────────────────────────────────────
+
 let newIngCount=1;
 function openNewRecipe(){
   newIngCount=1;
-  const body=`
-    <label class="field-label" style="margin-top:0">Recipe Name</label>
-    <input type="text" id="nr-name" placeholder="e.g. Chicken Tikka Masala">
-    <label class="field-label">Servings</label>
-    <input type="number" id="nr-servings" placeholder="2" value="2" min="1" style="width:80px">
-    <label class="field-label">Tags <span style="font-weight:400;color:var(--faint)">(comma-separated)</span></label>
-    <input type="text" id="nr-tags" placeholder="e.g. dinner, protein, quick">
-    <label class="field-label">Ingredients</label>
-    <div id="nr-ings"><div class="ing-row">
-      <input type="text" placeholder="Ingredient" id="ni-item-0">
-      <input type="text" placeholder="Qty" id="ni-qty-0">
-    </div></div>
-    <button class="add-ing-btn" onclick="addIngRow()">+ add ingredient</button>
-    <label class="field-label">Method</label>
-    <textarea id="nr-method" placeholder="How to make it…"></textarea>
-    <button class="save-btn" onclick="saveNewRecipe()">Save Recipe</button>
-    <div style="height:4px"></div>`;
-  openModal('New Recipe',body);
+  const cats=["Breakfast","Lunch","Dinner","Snack","Dessert","Other"].map(c=>'<option value="'+c+'">'+c+'</option>').join("");
+  const body='<label class="field-label" style="margin-top:0">Recipe Name</label><input type="text" id="nr-name" placeholder="e.g. Chicken Tikka Masala"><label class="field-label">Category</label><select id="nr-cat">'+cats+'</select><label class="field-label">Servings</label><input type="number" id="nr-servings" value="2" min="1" style="width:80px"><label class="field-label">Tags (comma-separated)</label><input type="text" id="nr-tags" placeholder="e.g. protein, quick"><label class="field-label">Ingredients</label><div id="nr-ings"><div class="ing-row"><input type="text" placeholder="Ingredient" id="ni-item-0"><input type="text" placeholder="Qty" id="ni-qty-0"></div></div><button class="add-ing-btn" onclick="addIngRow()">+ add ingredient</button><label class="field-label">Method</label><textarea id="nr-method" placeholder="How to make it..."></textarea><button class="save-btn" onclick="saveNewRecipe()">Save Recipe</button><div style="height:4px"></div>';
+  openModal("New Recipe",body);
 }
-function addIngRow(){
-  const c=newIngCount++;
-  const div=document.createElement('div');div.className='ing-row';
-  div.innerHTML=`<input type="text" placeholder="Ingredient" id="ni-item-${c}"><input type="text" placeholder="Qty" id="ni-qty-${c}">`;
-  document.getElementById('nr-ings').appendChild(div);
-}
-function saveNewRecipe(){
-  const name=document.getElementById('nr-name').value.trim();
-  if(!name){alert('Please enter a recipe name');return;}
-  const servings=parseInt(document.getElementById('nr-servings').value)||2;
-  const tags=document.getElementById('nr-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const instructions=document.getElementById('nr-method').value.trim();
-  const ingredients=[];
-  for(let i=0;i<newIngCount;i++){
-    const item=document.getElementById(`ni-item-${i}`)?.value.trim();
-    const qty=document.getElementById(`ni-qty-${i}`)?.value.trim();
-    if(item)ingredients.push({item,qty:qty||''});
-  }
-  state.recipes.push({id:Date.now(),name,servings,tags,instructions,ingredients});
-  save();closeModal();renderRecipes();
-}
- 
-// ── FAB ───────────────────────────────────────────────────────────────────
-function toggleFab(){
-  const labels=document.getElementById('fab-labels');
-  const btn=document.getElementById('fab-main');
-  const open=labels.style.display==='flex';
-  labels.style.display=open?'none':'flex';
-  btn.style.transform=open?'':'rotate(45deg)';
-}
- 
-// ── IMPORT FROM INSTAGRAM ─────────────────────────────────────────────────
+function addIngRow(){const c=newIngCount++;const d=document.createElement("div");d.className="ing-row";d.innerHTML='<input type="text" placeholder="Ingredient" id="ni-item-'+c+'"><input type="text" placeholder="Qty" id="ni-qty-'+c+'">';document.getElementById("nr-ings").appendChild(d);}
+function saveNewRecipe(){const name=document.getElementById("nr-name").value.trim();if(!name){alert("Please enter a name");return;}const category=document.getElementById("nr-cat").value;const servings=parseInt(document.getElementById("nr-servings").value)||2;const tags=document.getElementById("nr-tags").value.split(",").map(t=>t.trim()).filter(Boolean);const instructions=document.getElementById("nr-method").value.trim();const ingredients=[];for(let i=0;i<newIngCount;i++){const item=document.getElementById("ni-item-"+i)?.value.trim();const qty=document.getElementById("ni-qty-"+i)?.value.trim();if(item)ingredients.push({item,qty:qty||""});}state.recipes.push({id:Date.now(),name,category,servings,tags,instructions,ingredients});save();closeModal();renderRecipes();}
+
+function toggleFab(){const l=document.getElementById("fab-labels");const b=document.getElementById("fab-main");const open=l.style.display==="flex";l.style.display=open?"none":"flex";b.style.transform=open?"":"rotate(45deg)";}
+
 let importImageB64=null,importImageType=null,parsedImport=null;
-function openImportRecipe(){
-  const labels=document.getElementById('fab-labels');const btn=document.getElementById('fab-main');
-  if(labels){labels.style.display='none';btn.style.transform='';}
-  importImageB64=null;importImageType=null;parsedImport=null;
-  const body=`
-    <div class="import-tabs">
-      <button class="import-tab active" id="itab-text" onclick="switchImportTab('text')">📋 Paste Caption</button>
-      <button class="import-tab" id="itab-image" onclick="switchImportTab('image')">📸 Screenshot</button>
-    </div>
-    <div class="import-panel active" id="ipanel-text">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Copy the recipe caption from Instagram and paste it below.</p>
-      <textarea id="import-text" style="width:100%;height:140px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical" placeholder="Paste the Instagram caption here…"></textarea>
-      <button class="save-btn" style="margin-top:10px" onclick="parseTextRecipe()">✨ Parse Recipe</button>
-    </div>
-    <div class="import-panel" id="ipanel-image">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Upload a screenshot of the Instagram post.</p>
-      <div class="upload-zone" onclick="document.getElementById('img-upload').click()">
-        <div id="upload-preview-wrap"><div class="icon">📷</div><p>Tap to choose a screenshot</p></div>
-      </div>
-      <input type="file" id="img-upload" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-      <button class="save-btn" style="margin-top:12px" id="parse-img-btn" disabled onclick="parseImageRecipe()">✨ Parse Recipe</button>
-    </div>
-    <div id="import-loading" style="display:none;margin-top:14px"><div class="ai-loading"><div class="spinner"></div>Reading recipe with AI…</div></div>
-    <div id="import-result" style="display:none;margin-top:14px"></div>`;
-  openModal('Import from Instagram',body);
-}
-function switchImportTab(tab){
-  ['text','image'].forEach(t=>{
-    document.getElementById('itab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('ipanel-'+t).classList.toggle('active',t===tab);
-  });
-}
-function handleImageUpload(e){
-  const file=e.target.files[0];if(!file)return;
-  importImageType=file.type;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    importImageB64=ev.target.result.split(',')[1];
-    document.getElementById('upload-preview-wrap').innerHTML=`<img src="${ev.target.result}" class="upload-preview">`;
-    document.getElementById('parse-img-btn').disabled=false;
-  };
-  reader.readAsDataURL(file);
-}
-async function parseTextRecipe(){
-  const text=document.getElementById('import-text').value.trim();
-  if(!text){alert('Please paste some text first');return;}
-  await callClaudeForRecipe([{type:'text',text:`Extract the recipe from this Instagram caption:\n\n${text}`}]);
-}
-async function parseImageRecipe(){
-  if(!importImageB64)return;
-  await callClaudeForRecipe([{type:'image',source:{type:'base64',media_type:importImageType,data:importImageB64}},{type:'text',text:'Extract the recipe from this Instagram screenshot.'}]);
-}
+function openImportRecipe(){const l=document.getElementById("fab-labels");const b=document.getElementById("fab-main");if(l){l.style.display="none";b.style.transform="";}importImageB64=null;importImageType=null;parsedImport=null;const body='<div class="import-tabs"><button class="import-tab active" id="itab-text" onclick="switchImportTab(\'text\')">&#128203; Paste Caption</button><button class="import-tab" id="itab-image" onclick="switchImportTab(\'image\')">&#128248; Screenshot</button></div><div class="import-panel active" id="ipanel-text"><p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Copy the recipe caption from Instagram and paste below.</p><textarea id="import-text" style="width:100%;height:140px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical" placeholder="Paste the Instagram caption here..."></textarea><button class="save-btn" style="margin-top:10px" onclick="parseTextRecipe()">&#10024; Parse Recipe</button></div><div class="import-panel" id="ipanel-image"><p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic">Upload a screenshot of the Instagram post.</p><div class="upload-zone" onclick="document.getElementById(\'img-upload\').click()"><div id="upload-preview-wrap"><div class="icon">&#128247;</div><p>Tap to choose a screenshot</p></div></div><input type="file" id="img-upload" accept="image/*" style="display:none" onchange="handleImageUpload(event)"><button class="save-btn" style="margin-top:12px" id="parse-img-btn" disabled onclick="parseImageRecipe()">&#10024; Parse Recipe</button></div><div id="import-loading" style="display:none;margin-top:14px"><div class="ai-loading"><div class="spinner"></div>Reading recipe with AI...</div></div><div id="import-result" style="display:none;margin-top:14px"></div>';openModal("Import from Instagram",body);}
+function switchImportTab(tab){["text","image"].forEach(t=>{document.getElementById("itab-"+t).classList.toggle("active",t===tab);document.getElementById("ipanel-"+t).classList.toggle("active",t===tab);});}
+function handleImageUpload(e){const file=e.target.files[0];if(!file)return;importImageType=file.type;const reader=new FileReader();reader.onload=ev=>{importImageB64=ev.target.result.split(",")[1];document.getElementById("upload-preview-wrap").innerHTML='<img src="'+ev.target.result+'" class="upload-preview">';document.getElementById("parse-img-btn").disabled=false;};reader.readAsDataURL(file);}
+async function parseTextRecipe(){const text=document.getElementById("import-text").value.trim();if(!text){alert("Please paste some text first");return;}await callClaudeForRecipe([{type:"text",text:"Extract the recipe from this Instagram caption:\n\n"+text}]);}
+async function parseImageRecipe(){if(!importImageB64)return;await callClaudeForRecipe([{type:"image",source:{type:"base64",media_type:importImageType,data:importImageB64}},{type:"text",text:"Extract the recipe from this Instagram screenshot."}]);}
 async function callClaudeForRecipe(contentBlocks){
-  document.getElementById('import-loading').style.display='block';
-  document.getElementById('import-result').style.display='none';
-  parsedImport=null;
-  if(!state.apiKey){
-    document.getElementById('import-loading').style.display='none';
-    document.getElementById('import-result').style.display='block';
-    document.getElementById('import-result').innerHTML=`<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ No API key set. Go to <strong>Settings → Claude API Key</strong> and add your key first.</div>`;
-    return;
-  }
-  const prompt=`You are a recipe parser. Extract the recipe and return ONLY valid JSON, no markdown, no backticks:
-{"name":"Recipe Name","servings":2,"tags":["dinner","quick"],"instructions":"Method as single paragraph.","ingredients":[{"item":"Ingredient","qty":"amount"}]}
-Tags from: breakfast,lunch,dinner,quick,vegetarian,vegan,protein,healthy,prep-ahead.
-If no recipe found return {"error":"No recipe found"}.`;
+  document.getElementById("import-loading").style.display="block";document.getElementById("import-result").style.display="none";parsedImport=null;
+  if(!state.apiKey){document.getElementById("import-loading").style.display="none";document.getElementById("import-result").style.display="block";document.getElementById("import-result").innerHTML='<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">No API key set. Go to Settings.</div>';return;}
+  const prompt='You are a recipe parser. Return ONLY valid JSON, no markdown:\n{"name":"Recipe Name","category":"Dinner","servings":2,"tags":["dinner","quick"],"instructions":"Full method as sentences.","ingredients":[{"item":"Ingredient","qty":"amount"}]}\nCategory must be one of: Breakfast, Lunch, Dinner, Snack, Dessert, Other.\nIf no recipe found return {"error":"No recipe found"}.';
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:prompt,messages:[{role:'user',content:contentBlocks}]})
-    });
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    const raw=(data.content||[]).map(b=>b.text||'').join('').trim();
-    const clean=raw.replace(/^```json|^```|```$/gm,'').trim();
-    const parsed=JSON.parse(clean);
-    document.getElementById('import-loading').style.display='none';
-    if(parsed.error){
-      document.getElementById('import-result').style.display='block';
-      document.getElementById('import-result').innerHTML=`<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ ${parsed.error}.</div>`;
-      return;
-    }
-    parsedImport=parsed;
-    document.getElementById('import-result').style.display='block';
-    document.getElementById('import-result').innerHTML=`
-      <div class="ai-result"><strong style="font-size:14px">✅ ${parsed.name}</strong>
-        <div style="margin-top:6px;font-size:12px;color:var(--muted)">${parsed.ingredients.length} ingredients · ${(parsed.tags||[]).join(', ')}</div>
-        <div style="margin-top:6px;font-size:12px;line-height:1.5">${parsed.ingredients.slice(0,4).map(i=>`${i.qty} ${i.item}`).join(' · ')}${parsed.ingredients.length>4?` · +${parsed.ingredients.length-4} more`:''}</div>
-      </div>
-      <button class="import-btn" onclick="confirmImport()">Add to My Recipes →</button>`;
-  }catch(err){
-    document.getElementById('import-loading').style.display='none';
-    document.getElementById('import-result').style.display='block';
-    document.getElementById('import-result').innerHTML=`<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">⚠️ ${err.message||'Something went wrong. Check your API key in Settings.'}</div>`;
-  }
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":state.apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:prompt,messages:[{role:"user",content:contentBlocks}]})});
+    const data=await res.json();if(data.error)throw new Error(data.error.message);
+    const raw=(data.content||[]).map(b=>b.text||"").join("").trim();const clean=raw.replace(/^```json|^```|```$/gm,"").trim();const parsed=JSON.parse(clean);
+    document.getElementById("import-loading").style.display="none";
+    if(parsed.error){document.getElementById("import-result").style.display="block";document.getElementById("import-result").innerHTML='<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">'+parsed.error+'</div>';return;}
+    parsedImport=parsed;document.getElementById("import-result").style.display="block";document.getElementById("import-result").innerHTML='<div class="ai-result"><strong>'+parsed.name+'</strong> ('+( parsed.category||"Recipe")+')<div style="margin-top:4px;font-size:12px;color:var(--muted)">'+parsed.ingredients.length+' ingredients</div></div><button class="import-btn" onclick="confirmImport()">Add to My Recipes &#8594;</button>';
+  }catch(err){document.getElementById("import-loading").style.display="none";document.getElementById("import-result").style.display="block";document.getElementById("import-result").innerHTML='<div class="ai-result" style="background:#fdf0f0;border-color:#e0b0b0;color:#6b2a2a">'+(err.message||"Something went wrong.")+'</div>';}
 }
-function confirmImport(){
-  if(!parsedImport)return;
-  state.recipes.push({id:Date.now(),...parsedImport});
-  save();closeModal();renderRecipes();
-}
- 
-// ── GOOGLE SHEETS SYNC ────────────────────────────────────────────────────
-const APPS_SCRIPT_CODE=`function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data") 
-              || SpreadsheetApp.getActiveSpreadsheet().insertSheet("data");
-  var data = sheet.getRange("A1").getValue();
-  return ContentService.createTextOutput(data || "{}").setMimeType(ContentService.MimeType.JSON);
-}
- 
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data") 
-              || SpreadsheetApp.getActiveSpreadsheet().insertSheet("data");
-  sheet.getRange("A1").setValue(e.postData.contents);
-  return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
-}`;
- 
-function updateSyncDot(status,label){
-  const dot=document.getElementById('sync-dot');const lbl=document.getElementById('sync-label');
-  if(!dot)return;dot.className='sync-dot '+status;if(lbl)lbl.textContent=label;
-}
-async function syncToSheet(){
-  if(!state.syncUrl)return;
-  updateSyncDot('syncing','syncing…');
-  try{
-    await fetch(state.syncUrl,{method:'POST',body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems}),headers:{'Content-Type':'text/plain'}});
-    updateSyncDot('ok','synced');
-  }catch{updateSyncDot('err','sync failed');}
-}
-async function loadFromSheet(){
-  if(!state.syncUrl)return false;
-  updateSyncDot('syncing','loading…');
-  try{
-    const res=await fetch(state.syncUrl+'?t='+Date.now());
-    const text=await res.text();
-    if(!text||text==='{}'){updateSyncDot('ok','synced');return false;}
-    const data=JSON.parse(text);
-    if(data.plan)state.plan=data.plan;
-    if(data.recipes)state.recipes=data.recipes;
-    if(data.pantry)state.pantry=data.pantry;
-    if(data.eatingOut)state.eatingOut=data.eatingOut;
-    if(data.extraShopItems)state.extraShopItems=data.extraShopItems;
-    try{localStorage.setItem('deux-semaines-v3',JSON.stringify(state));}catch{}
-    updateSyncDot('ok','synced');return true;
-  }catch{updateSyncDot('err','load failed');return false;}
-}
-async function testAndConnect(){
-  const input=document.getElementById('sync-url-input');if(!input)return;
-  const url=input.value.trim();
-  if(!url.startsWith('https://script.google.com')){showSettingsStatus('err','⚠️ That doesn\'t look like a Google Apps Script URL.');return;}
-  state.syncUrl=url;try{localStorage.setItem('deux-semaines-v3',JSON.stringify(state));}catch{}
-  showSettingsStatus('ok','⏳ Testing connection…');
-  const ok=await loadFromSheet();
-  if(ok!==false||state.syncUrl){showSettingsStatus('ok','✅ Connected! Your plan will now sync automatically.');renderPlanner();renderRecipes();}
-  else{showSettingsStatus('err','⚠️ Could not connect. Double-check the URL and that you deployed as "Anyone".');}
-}
-async function manualSync(){
-  const btn=document.getElementById('sync-now-btn');if(btn)btn.disabled=true;
-  await loadFromSheet();await syncToSheet();
-  if(btn)btn.disabled=false;
-  renderPlanner();renderRecipes();renderShopping();
-  showSettingsStatus('ok','✅ Synced successfully!');
-}
-function showSettingsStatus(type,msg){
-  const box=document.getElementById('settings-status');if(!box)return;
-  box.className='status-box '+type;box.style.display='block';box.textContent=msg;
-}
-function copyScriptCode(){
-  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>{
-    const btn=document.getElementById('copy-code-btn');
-    if(btn){btn.textContent='✅ Copied!';setTimeout(()=>btn.textContent='Copy to clipboard',2000);}
-  }).catch(()=>{
-    const el=document.getElementById('script-code-block');
-    if(el){const r=document.createRange();r.selectNode(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);}
-  });
-}
- 
-// ── SETTINGS ─────────────────────────────────────────────────────────────
+function confirmImport(){if(!parsedImport)return;state.recipes.push({id:Date.now(),...parsedImport});save();closeModal();renderRecipes();}
+
+const APPS_SCRIPT_CODE="function doGet(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  var data = sheet.getRange(\"A1\").getValue();\n  return ContentService.createTextOutput(data || \"{}\").setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction doPost(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  sheet.getRange(\"A1\").setValue(e.postData.contents);\n  return ContentService.createTextOutput(\"ok\").setMimeType(ContentService.MimeType.TEXT);\n}";
+function updateSyncDot(s,l){const d=document.getElementById("sync-dot");const lb=document.getElementById("sync-label");if(!d)return;d.className="sync-dot "+s;if(lb)lb.textContent=l;}
+async function syncToSheet(){if(!state.syncUrl)return;updateSyncDot("syncing","syncing...");try{await fetch(state.syncUrl,{method:"POST",body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,freezer:state.freezer,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems}),headers:{"Content-Type":"text/plain"}});updateSyncDot("ok","synced");}catch{updateSyncDot("err","sync failed");}}
+async function loadFromSheet(){if(!state.syncUrl)return false;updateSyncDot("syncing","loading...");try{const res=await fetch(state.syncUrl+"?t="+Date.now());const text=await res.text();if(!text||text==="{}"){{updateSyncDot("ok","synced");return false;}}const data=JSON.parse(text);["plan","recipes","pantry","freezer","eatingOut","extraShopItems"].forEach(k=>{if(data[k])state[k]=data[k];});try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}updateSyncDot("ok","synced");return true;}catch{updateSyncDot("err","load failed");return false;}}
+async function testAndConnect(){const input=document.getElementById("sync-url-input");if(!input)return;const url=input.value.trim();if(!url.startsWith("https://script.google.com")){showSettingsStatus("err","Doesn't look like a Google Apps Script URL.");return;}state.syncUrl=url;try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}showSettingsStatus("ok","Testing...");await loadFromSheet();showSettingsStatus("ok","Connected!");renderPlanner();renderRecipes();}
+async function manualSync(){const btn=document.getElementById("sync-now-btn");if(btn)btn.disabled=true;await loadFromSheet();await syncToSheet();if(btn)btn.disabled=false;renderPlanner();renderRecipes();renderShopping();showSettingsStatus("ok","Synced!");}
+function showSettingsStatus(type,msg){const b=document.getElementById("settings-status");if(!b)return;b.className="status-box "+type;b.style.display="block";b.textContent=msg;}
+function copyScriptCode(){navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>{const b=document.getElementById("copy-code-btn");if(b){b.textContent="Copied!";setTimeout(()=>b.textContent="Copy to clipboard",2000);}});}
+
 function renderSettings(){
   const connected=!!state.syncUrl;
-  const html=`
-    <h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px">Settings</h2>
-    <div class="settings-section">
-      <h3>🔄 Google Sheets Sync</h3>
-      <p>Share your meal plan with your partner in real time. Follow these steps once:</p>
-      <ol>
-        <li>Go to <strong>sheets.google.com</strong> and create a new blank spreadsheet</li>
-        <li>Click <strong>Extensions → Apps Script</strong></li>
-        <li>Delete everything, paste the code below, click <strong>Save</strong></li>
-        <li>Click <strong>Deploy → New deployment → Web app</strong></li>
-        <li>Set "Who has access" to <strong>Anyone</strong>, click <strong>Deploy</strong></li>
-        <li>Copy the <strong>Web app URL</strong> and paste below</li>
-      </ol>
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Apps Script Code</span>
-          <button class="copy-code-btn" id="copy-code-btn" onclick="copyScriptCode()">Copy to clipboard</button>
-        </div>
-        <div class="script-code" id="script-code-block">${APPS_SCRIPT_CODE.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-      </div>
-      <label style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Web App URL</label>
-      <div class="sync-url-row">
-        <input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/…" value="${state.syncUrl||''}">
-        <button class="connect-btn" onclick="testAndConnect()">Connect</button>
-      </div>
-      <div id="settings-status" class="status-box ${connected?'ok':''}" style="${connected?'display:block':'display:none'}">${connected?'✅ Connected to Google Sheets':''}</div>
-      ${connected?`<button class="sync-now-btn" id="sync-now-btn" onclick="manualSync()">↕ Sync Now</button>`:''}
-    </div>
-    <div class="settings-section">
-      <h3>🤖 Claude API Key</h3>
-      <p>Required for Instagram recipe import. Stored only on this device.</p>
-      <ol>
-        <li>Go to <strong>console.anthropic.com</strong> and sign up</li>
-        <li>Click <strong>API Keys</strong> and create a new key</li>
-        <li>Paste it below and tap Save</li>
-      </ol>
-      <div class="sync-url-row">
-        <input type="password" id="api-key-input" placeholder="sk-ant-…" value="${state.apiKey||''}">
-        <button class="connect-btn" onclick="saveApiKey()">Save</button>
-      </div>
-      <div id="api-key-status" class="status-box ${state.apiKey?'ok':''}" style="${state.apiKey?'display:block':'display:none'}">${state.apiKey?'✅ API key saved — Instagram import enabled':''}</div>
-    </div>
-    <div class="settings-section">
-      <h3>⚠️ Reset Data</h3>
-      <p>Clear all local data on this device. Won't affect your partner's data or the Google Sheet.</p>
-      <button onclick="resetData()" style="background:none;border:1.5px solid #e57373;color:#c62828;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Reset this device</button>
-    </div>`;
-  document.getElementById('view-settings').innerHTML=html;
+  const sc=APPS_SCRIPT_CODE.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  document.getElementById("view-settings").innerHTML='<h2 style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-bottom:20px">Settings</h2><div class="settings-section"><h3>&#128260; Google Sheets Sync</h3><p>Share your meal plan with your partner in real time.</p><ol><li>Go to <strong>sheets.google.com</strong>, create a blank spreadsheet</li><li>Click <strong>Extensions &#8594; Apps Script</strong></li><li>Delete everything, paste the code below, click <strong>Save</strong></li><li>Click <strong>Deploy &#8594; New deployment &#8594; Web app</strong></li><li>Set "Who has access" to <strong>Anyone</strong>, click <strong>Deploy</strong></li><li>Copy the <strong>Web app URL</strong> and paste below</li></ol><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Apps Script Code</span><button class="copy-code-btn" id="copy-code-btn" onclick="copyScriptCode()">Copy to clipboard</button></div><div class="script-code">'+sc+'</div><label style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Web App URL</label><div class="sync-url-row"><input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/..." value="'+(state.syncUrl||"")+'"><button class="connect-btn" onclick="testAndConnect()">Connect</button></div><div id="settings-status" class="status-box '+(connected?"ok":"")+'" style="'+(connected?"display:block":"display:none")+'">'+(connected?"Connected to Google Sheets":"")+'</div>'+(connected?'<button class="sync-now-btn" id="sync-now-btn" onclick="manualSync()">&#8597; Sync Now</button>':"")+'</div><div class="settings-section"><h3>&#129302; Claude API Key</h3><p>Required for Instagram recipe import. Stored only on this device.</p><ol><li>Go to <strong>console.anthropic.com</strong>, sign up</li><li>Click <strong>API Keys</strong> &#8594; create a key</li><li>Paste it below</li></ol><div class="sync-url-row"><input type="password" id="api-key-input" placeholder="sk-ant-..." value="'+(state.apiKey||"")+'"><button class="connect-btn" onclick="saveApiKey()">Save</button></div><div id="api-key-status" class="status-box '+(state.apiKey?"ok":"")+'" style="'+(state.apiKey?"display:block":"display:none")+'">'+(state.apiKey?"API key saved":"")+'</div></div><div class="settings-section"><h3>&#9888;&#65039; Reset Data</h3><p>Clear all local data on this device.</p><button onclick="resetData()" style="background:none;border:1.5px solid #e57373;color:#c62828;border-radius:8px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Reset this device</button></div>';
 }
- 
-function saveApiKey(){
-  const key=document.getElementById('api-key-input').value.trim();
-  if(!key.startsWith('sk-ant-')){
-    const box=document.getElementById('api-key-status');
-    box.className='status-box err';box.style.display='block';
-    box.textContent='⚠️ That doesn\'t look right — key should start with sk-ant-';return;
-  }
-  state.apiKey=key;try{localStorage.setItem('deux-semaines-v3',JSON.stringify(state));}catch{}
-  const box=document.getElementById('api-key-status');
-  box.className='status-box ok';box.style.display='block';
-  box.textContent='✅ API key saved — Instagram import enabled';
-}
- 
-function resetData(){
-  if(!confirm('Reset all data on this device? Cannot be undone.'))return;
-  state.plan=emptyPlan();state.recipes=DEFAULT_RECIPES;state.checked={};state.eatingOut={};state.pantry=[];state.extraShopItems=[];
-  save();showView('planner');
-}
- 
-function save(){
-  try{localStorage.setItem('deux-semaines-v3',JSON.stringify(state));}catch{}
-  if(state.syncUrl)syncToSheet();
-}
- 
-// ── PWA INSTALL ───────────────────────────────────────────────────────────
+function saveApiKey(){const k=document.getElementById("api-key-input").value.trim();if(!k.startsWith("sk-ant-")){const b=document.getElementById("api-key-status");b.className="status-box err";b.style.display="block";b.textContent="Key should start with sk-ant-";return;}state.apiKey=k;try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}const b=document.getElementById("api-key-status");b.className="status-box ok";b.style.display="block";b.textContent="API key saved";}
+function resetData(){if(!confirm("Reset all data?"))return;state.plan=emptyPlan();state.recipes=DEFAULT_RECIPES;state.checked={};state.eatingOut={};state.pantry=[];state.freezer=[];state.extraShopItems=[];save();showView("planner");}
+
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();deferredPrompt=e;
-  if(!localStorage.getItem('install-dismissed'))setTimeout(()=>{document.getElementById('install-banner').style.display='block';},2000);
-});
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;if(!localStorage.getItem("install-dismissed"))setTimeout(()=>{document.getElementById("install-banner").style.display="block";},2000);});
 function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissBanner();});}}
-function dismissBanner(){document.getElementById('install-banner').style.display='none';localStorage.setItem('install-dismissed','1');}
-window.addEventListener('appinstalled',()=>{document.getElementById('install-banner').style.display='none';});
- 
-if('serviceWorker'in navigator){
-  const swCode=`const CACHE='deux-semaines-v3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));});self.addEventListener('fetch',e=>{if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));}});`;
-  const swBlob=new Blob([swCode],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
-}
- 
-// ── INIT ──────────────────────────────────────────────────────────────────
-showView('planner');
-if(state.syncUrl){updateSyncDot('syncing','loading…');loadFromSheet().then(changed=>{if(changed){renderPlanner();renderRecipes();}});}
+function dismissBanner(){document.getElementById("install-banner").style.display="none";localStorage.setItem("install-dismissed","1");}
+if("serviceWorker"in navigator){const c="const C='dsv4';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('fetch',e=>{if(e.request.mode==='navigate')e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});";navigator.serviceWorker.register(URL.createObjectURL(new Blob([c],{type:"application/javascript"}))).catch(()=>{});}
+
+showView("planner");
+if(state.syncUrl){updateSyncDot("syncing","loading...");loadFromSheet().then(changed=>{if(changed){renderPlanner();renderRecipes();}});}
 </script>
 </body>
 </html>
- 
