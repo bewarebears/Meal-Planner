@@ -269,11 +269,17 @@ function renderPlanner(){
         const cell=w+"-"+d+"-"+meal;const rid=state.plan[cell];const recipe=rid?getRecipe(rid):null;
         const isSrc=moveSource&&moveSource.cell===cell;const isTgt=moveSource&&moveSource.cell!==cell;
         html+='<div class="meal-row"><div class="meal-tag '+MEAL_CSS[meal]+'">'+meal+'</div>';
-        html+='<div class="meal-cell '+(recipe?"filled ":"")+(isSrc?"move-source ":"")+(isTgt?"move-target ":"")+'" onclick="'+(moveSource?"doMove('"+cell+"')":"openAssign('"+cell+"','"+meal+"','"+DAYS_FULL[d]+"')")+'"><div class="meal-cell-inner">';
-        if(recipe){html+='<div class="cell-name">'+recipe.name+'</div><div class="cell-tags">'+recipe.tags.slice(0,4).map(t=>'<span class="tag-dot" style="background:'+(TAG_COLORS[t]||"#ccc")+'"></span>').join("")+'</div>';}
+        html+='<div class="meal-cell '+(recipe?"filled ":"")+(isSrc?"move-source ":"")+(isTgt?"move-target ":"")+'" onclick="'+(moveSource?"doMove('"+cell+"')":"openAssign('"+cell+"','"+meal+"','"+DAYS_FULL[d]+"')")+'"><div class="meal-cell-inner" style="flex:1;display:flex;flex-direction:column">';
+        if(recipe){html+='<div class="cell-name">'+recipe.name+'</div>';}
         else{html+='<div class="cell-empty">'+(moveSource?"Tap to place here":"Tap to add...")+'</div>';}
         html+='</div>';
-        if(recipe&&!moveSource){html+='<div class="cell-actions"><button class="cell-icon-btn" onclick="event.stopPropagation();openRecipe('+recipe.id+')">&#128065;</button><button class="cell-icon-btn" onclick="event.stopPropagation();startMove(\''+cell+'\','+recipe.id+')">&#8597;</button><button class="cell-icon-btn" onclick="event.stopPropagation();clearCell(\''+cell+'\')">&#10005;</button></div>';}
+        if(recipe&&!moveSource){
+          html+='<div style="display:flex;gap:6px;padding:0 10px 8px;border-top:1px solid var(--warm);margin-top:2px" onclick="event.stopPropagation()">';
+          html+='<button onclick="openRecipe('+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View</button>';
+          html+='<button onclick="startMove(\''+cell+'\','+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#8597; Move</button>';
+          html+='<button onclick="clearCell(\''+cell+'\')" style="flex:1;background:#fef2f2;border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:#c62828">&#10005; Remove</button>';
+          html+='</div>';
+        }
         html+='</div></div>';
       });
     }
@@ -293,9 +299,15 @@ function renderRecipes(){
   const filtered=cat==="All"?state.recipes:cat==="Other"?state.recipes.filter(r=>!RECIPE_CATS.slice(1,-1).includes(r.category||"")):state.recipes.filter(r=>(r.category||"")===cat);
   if(!filtered.length)html+='<div class="empty-state">No '+cat.toLowerCase()+' recipes yet.</div>';
   filtered.forEach(r=>{
-    html+='<div class="recipe-card"><div class="recipe-card-top"><div class="recipe-card-title"><span>'+r.name+'</span><div style="display:flex;gap:6px"><button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="openRecipe('+r.id+')">&#128065;</button><button style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px" onclick="deleteRecipe('+r.id+')">&#128465;</button></div></div>';
-    html+='<div style="font-size:11px;color:var(--faint);margin-top:3px">'+(r.category||"Uncategorised")+'</div><div class="tags-row">'+r.tags.map(tagChip).join("")+'</div></div>';
-    html+='<div class="recipe-card-body">'+r.ingredients.slice(0,3).map(i=>'<div class="recipe-ing"><span class="qty">'+i.qty+'</span> '+i.item+'</div>').join("")+(r.ingredients.length>3?'<div class="recipe-more">+'+(r.ingredients.length-3)+' more...</div>':'')+'</div></div>';
+    const tags=r.tags||[];
+    html+='<div class="recipe-card"><div class="recipe-card-top"><div class="recipe-card-title"><span>'+r.name+'</span></div>';
+    html+='<div style="font-size:11px;color:var(--faint);margin-top:3px">'+(r.category||"Uncategorised")+'</div>';
+    html+='<div class="tags-row">'+tags.map(tagChip).join("")+'</div></div>';
+    html+='<div class="recipe-card-body">'+r.ingredients.slice(0,3).map(i=>'<div class="recipe-ing"><span class="qty">'+i.qty+'</span> '+i.item+'</div>').join("")+(r.ingredients.length>3?'<div class="recipe-more">+'+(r.ingredients.length-3)+' more...</div>':'')+'</div>';
+    html+='<div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--warm)">';
+    html+='<button onclick="openRecipe('+r.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View Recipe</button>';
+    html+='<button onclick="deleteRecipe('+r.id+')" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:#c62828">&#128465; Delete</button>';
+    html+='</div></div>';
   });
   html+='</div>';
   document.getElementById("view-recipes").innerHTML=html;
@@ -313,10 +325,14 @@ function openRecipe(id,servings){
   body+='<div class="scaler-row"><span class="scaler-label">Servings</span><button class="scaler-btn" onclick="openRecipe('+id+','+(Math.max(1,cur-1))+')">&#8722;</button><span class="scaler-val">'+cur+'</span><button class="scaler-btn" onclick="openRecipe('+id+','+(cur+1)+')">+</button></div>';
   body+='<div class="tags-row" style="margin-bottom:16px">'+r.tags.map(tagChip).join("")+'</div>';
   body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Ingredients</div>';
-  r.ingredients.forEach(i=>{
+  r.ingredients.forEach((i,idx)=>{
     const inP=state.pantry.some(p=>p.item.toLowerCase()===i.item.toLowerCase());
     const inF=state.freezer.some(f=>f.name.toLowerCase().includes(i.item.toLowerCase()));
-    body+='<div class="detail-row"><span>'+i.item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+'</span><span class="detail-qty">'+scaleQty(i.qty)+'</span></div>';
+    body+='<div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid var(--warm);gap:8px">';
+    body+='<div style="flex:1;font-size:14px">'+i.item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+'</div>';
+    body+='<div style="font-size:14px;color:var(--faint);font-weight:600;white-space:nowrap">'+scaleQty(i.qty)+'</div>';
+    body+='<button onclick="removeIngredientFromRecipe('+id+','+idx+','+cur+')" style="background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:0 2px;line-height:1;flex-shrink:0">&#10005;</button>';
+    body+='</div>';
   });
   if(r.instructions){
     const steps=r.instructions.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>2);
@@ -346,7 +362,14 @@ function saveIngredientToRecipe(id, servings){
   const r=getRecipe(id);if(!r)return;
   r.ingredients.push({item,qty});
   save();
-  // re-open the recipe at same servings so user sees the new ingredient
+  openRecipe(id, servings);
+}
+
+function removeIngredientFromRecipe(id, idx, servings){
+  const r=getRecipe(id);if(!r)return;
+  if(r.ingredients.length<=1){alert("A recipe needs at least one ingredient.");return;}
+  r.ingredients.splice(idx,1);
+  save();
   openRecipe(id, servings);
 }
 function deleteRecipe(id){if(!confirm("Delete this recipe?"))return;state.recipes=state.recipes.filter(r=>r.id!==id);Object.keys(state.plan).forEach(k=>{if(state.plan[k]===id)state.plan[k]=null;});save();renderRecipes();}
@@ -465,10 +488,10 @@ function confirmImport(){if(!parsedImport)return;state.recipes.push({id:Date.now
 
 const APPS_SCRIPT_CODE="function doGet(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  var data = sheet.getRange(\"A1\").getValue();\n  return ContentService.createTextOutput(data || \"{}\").setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction doPost(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  sheet.getRange(\"A1\").setValue(e.postData.contents);\n  return ContentService.createTextOutput(\"ok\").setMimeType(ContentService.MimeType.TEXT);\n}";
 function updateSyncDot(s,l){const d=document.getElementById("sync-dot");const lb=document.getElementById("sync-label");if(!d)return;d.className="sync-dot "+s;if(lb)lb.textContent=l;}
-async function syncToSheet(){if(!state.syncUrl)return;updateSyncDot("syncing","syncing...");try{await fetch(state.syncUrl,{method:"POST",body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,freezer:state.freezer,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems}),headers:{"Content-Type":"text/plain"}});updateSyncDot("ok","synced");}catch{updateSyncDot("err","sync failed");}}
-async function loadFromSheet(){if(!state.syncUrl)return false;updateSyncDot("syncing","loading...");try{const res=await fetch(state.syncUrl+"?t="+Date.now());const text=await res.text();if(!text||text==="{}"){{updateSyncDot("ok","synced");return false;}}const data=JSON.parse(text);["plan","recipes","pantry","freezer","eatingOut","extraShopItems"].forEach(k=>{if(data[k])state[k]=data[k];});try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}updateSyncDot("ok","synced");return true;}catch{updateSyncDot("err","load failed");return false;}}
+async function syncToSheet(){if(!state.syncUrl)return;updateSyncDot("syncing","syncing...");try{await fetch(state.syncUrl,{method:"POST",body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,freezer:state.freezer,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems,checked:state.checked}),headers:{"Content-Type":"text/plain"}});updateSyncDot("ok","synced");}catch{updateSyncDot("err","sync failed");}}
+async function loadFromSheet(){if(!state.syncUrl)return false;updateSyncDot("syncing","loading...");try{const res=await fetch(state.syncUrl+"?t="+Date.now());const text=await res.text();if(!text||text==="{}"){{updateSyncDot("ok","synced");return false;}}const data=JSON.parse(text);["plan","recipes","pantry","freezer","eatingOut","extraShopItems","checked"].forEach(k=>{if(data[k]!==undefined)state[k]=data[k];});try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}updateSyncDot("ok","synced");return true;}catch{updateSyncDot("err","load failed");return false;}}
 async function testAndConnect(){const input=document.getElementById("sync-url-input");if(!input)return;const url=input.value.trim();if(!url.startsWith("https://script.google.com")){showSettingsStatus("err","Doesn't look like a Google Apps Script URL.");return;}state.syncUrl=url;try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}showSettingsStatus("ok","Testing...");await loadFromSheet();showSettingsStatus("ok","Connected!");renderPlanner();renderRecipes();}
-async function manualSync(){const btn=document.getElementById("sync-now-btn");if(btn)btn.disabled=true;await loadFromSheet();await syncToSheet();if(btn)btn.disabled=false;renderPlanner();renderRecipes();renderShopping();showSettingsStatus("ok","Synced!");}
+async function manualSync(){const btn=document.getElementById("sync-now-btn");if(btn)btn.disabled=true;await loadFromSheet();await syncToSheet();if(btn)btn.disabled=false;renderPlanner();renderRecipes();renderShopping();renderFreezer();renderPantry();showSettingsStatus("ok","Synced!");}
 function showSettingsStatus(type,msg){const b=document.getElementById("settings-status");if(!b)return;b.className="status-box "+type;b.style.display="block";b.textContent=msg;}
 function copyScriptCode(){navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>{const b=document.getElementById("copy-code-btn");if(b){b.textContent="Copied!";setTimeout(()=>b.textContent="Copy to clipboard",2000);}});}
 
