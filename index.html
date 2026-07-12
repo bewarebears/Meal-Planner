@@ -229,9 +229,9 @@ const DEFAULT_RECIPES=[
 ];
 
 function emptyPlan(){const p={};for(let w=1;w<=2;w++)for(let d=0;d<7;d++)for(const m of MEALS)p[w+"-"+d+"-"+m]=null;return p;}
-let state={plan:emptyPlan(),recipes:DEFAULT_RECIPES,week:1,view:"planner",recipeCat:"All",shopWeeks:[1,2],checked:{},eatingOut:{},pantry:[],freezer:[],extraShopItems:[],syncUrl:"",apiKey:""};
+let state={plan:emptyPlan(),recipes:DEFAULT_RECIPES,week:1,view:"planner",recipeCat:"All",shopWeeks:[1,2],checked:{},eatingOut:{},pantry:[],freezer:[],freezerPlan:{},extraShopItems:[],syncUrl:"",apiKey:""};
 let moveSource=null;
-function load(){try{const s=localStorage.getItem("deux-semaines-v4");if(s){const d=JSON.parse(s);Object.assign(state,d);["pantry","freezer","extraShopItems"].forEach(k=>{if(!state[k])state[k]=[];});if(!state.eatingOut)state.eatingOut={};}}catch(e){}}
+function load(){try{const s=localStorage.getItem("deux-semaines-v4");if(s){const d=JSON.parse(s);Object.assign(state,d);["pantry","freezer","extraShopItems"].forEach(k=>{if(!state[k])state[k]=[];});if(!state.eatingOut)state.eatingOut={};if(!state.freezerPlan)state.freezerPlan={};}}catch(e){}}
 function save(){try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}if(state.syncUrl)syncToSheet();}
 load();
 function getRecipe(id){return state.recipes.find(r=>r.id===id);}
@@ -266,17 +266,23 @@ function renderPlanner(){
     if(isEO){html+='<div style="padding:14px;text-align:center;font-size:13px;color:var(--faint);font-style:italic">No cooking tonight!</div>';}
     else{
       MEALS.forEach(meal=>{
-        const cell=w+"-"+d+"-"+meal;const rid=state.plan[cell];const recipe=rid?getRecipe(rid):null;
+        const cell=w+"-"+d+"-"+meal;
+        const rid=state.plan[cell];
+        const fzIdx=(state.freezerPlan&&state.freezerPlan[cell]!==undefined)?state.freezerPlan[cell]:null;
+        const recipe=rid?getRecipe(rid):null;
+        const fzMeal=fzIdx!==null?state.freezer[fzIdx]:null;
+        const isFilled=!!(recipe||fzMeal);
         const isSrc=moveSource&&moveSource.cell===cell;const isTgt=moveSource&&moveSource.cell!==cell;
         html+='<div class="meal-row"><div class="meal-tag '+MEAL_CSS[meal]+'">'+meal+'</div>';
-        html+='<div class="meal-cell '+(recipe?"filled ":"")+(isSrc?"move-source ":"")+(isTgt?"move-target ":"")+'" onclick="'+(moveSource?"doMove('"+cell+"')":"openAssign('"+cell+"','"+meal+"','"+DAYS_FULL[d]+"')")+'"><div class="meal-cell-inner" style="flex:1;display:flex;flex-direction:column">';
+        html+='<div class="meal-cell '+(isFilled?"filled ":"")+(isSrc?"move-source ":"")+(isTgt?"move-target ":"")+'" onclick="'+(moveSource?"doMove('"+cell+"')":"openAssign('"+cell+"','"+meal+"','"+DAYS_FULL[d]+"')")+'"><div class="meal-cell-inner" style="flex:1;display:flex;flex-direction:column">';
         if(recipe){html+='<div class="cell-name">'+recipe.name+'</div>';}
+        else if(fzMeal){html+='<div class="cell-name" style="color:#1565c0">&#129482; '+fzMeal.name+'</div>';}
         else{html+='<div class="cell-empty">'+(moveSource?"Tap to place here":"Tap to add...")+'</div>';}
         html+='</div>';
-        if(recipe&&!moveSource){
+        if(isFilled&&!moveSource){
           html+='<div style="display:flex;gap:6px;padding:0 10px 8px;border-top:1px solid var(--warm);margin-top:2px" onclick="event.stopPropagation()">';
-          html+='<button onclick="openRecipe('+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View</button>';
-          html+='<button onclick="startMove(\''+cell+'\','+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#8597; Move</button>';
+          if(recipe){html+='<button onclick="openRecipe('+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View</button>';}
+          if(recipe){html+='<button onclick="startMove(\''+cell+'\','+recipe.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#8597; Move</button>';}
           html+='<button onclick="clearCell(\''+cell+'\')" style="flex:1;background:#fef2f2;border:none;border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:#c62828">&#10005; Remove</button>';
           html+='</div>';
         }
@@ -287,7 +293,6 @@ function renderPlanner(){
   }
   document.getElementById("view-planner").innerHTML=html;
 }
-function clearCell(cell){state.plan[cell]=null;save();renderPlanner();}
 function toggleEatingOut(key){if(state.eatingOut[key])delete state.eatingOut[key];else state.eatingOut[key]=true;save();renderPlanner();}
 function startMove(cell,rid){moveSource={cell,rid};const r=getRecipe(rid);document.getElementById("move-banner").style.display="flex";document.getElementById("move-banner-text").textContent='Moving "'+r.name+'" \u2014 tap any slot';renderPlanner();}
 function cancelMove(){moveSource=null;document.getElementById("move-banner").style.display="none";renderPlanner();}
@@ -305,8 +310,9 @@ function renderRecipes(){
     html+='<div class="tags-row">'+tags.map(tagChip).join("")+'</div></div>';
     html+='<div class="recipe-card-body">'+r.ingredients.slice(0,3).map(i=>'<div class="recipe-ing"><span class="qty">'+i.qty+'</span> '+i.item+'</div>').join("")+(r.ingredients.length>3?'<div class="recipe-more">+'+(r.ingredients.length-3)+' more...</div>':'')+'</div>';
     html+='<div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--warm)">';
-    html+='<button onclick="openRecipe('+r.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View Recipe</button>';
-    html+='<button onclick="deleteRecipe('+r.id+')" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:#c62828">&#128465; Delete</button>';
+    html+='<button onclick="openRecipe('+r.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#128065; View</button>';
+    html+='<button onclick="openEditRecipe('+r.id+')" style="flex:1;background:var(--warm);border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--ink2)">&#9999;&#65039; Edit</button>';
+    html+='<button onclick="deleteRecipe('+r.id+')" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:#c62828">&#128465;</button>';
     html+='</div></div>';
   });
   html+='</div>';
@@ -374,13 +380,70 @@ function removeIngredientFromRecipe(id, idx, servings){
 }
 function deleteRecipe(id){if(!confirm("Delete this recipe?"))return;state.recipes=state.recipes.filter(r=>r.id!==id);Object.keys(state.plan).forEach(k=>{if(state.plan[k]===id)state.plan[k]=null;});save();renderRecipes();}
 
+function openEditRecipe(id){
+  const r=getRecipe(id);if(!r)return;
+  const cats=["Breakfast","Lunch","Dinner","Snack","Dessert","Other"].map(c=>'<option value="'+c+'"'+(r.category===c?" selected":"")+'>'+c+'</option>').join("");
+  let ingRows=(r.ingredients||[]).map((i,idx)=>'<div class="ing-row" id="edit-ing-row-'+idx+'"><input type="text" placeholder="Ingredient" id="edit-ni-item-'+idx+'" value="'+i.item.replace(/"/g,'&quot;')+'"><input type="text" placeholder="Qty" id="edit-ni-qty-'+idx+'" value="'+i.qty.replace(/"/g,'&quot;')+'"></div>').join("");
+  const body=`
+    <label class="field-label" style="margin-top:0">Recipe Name</label>
+    <input type="text" id="edit-nr-name" value="${(r.name||'').replace(/"/g,'&quot;')}">
+    <label class="field-label">Category</label>
+    <select id="edit-nr-cat">${cats}</select>
+    <label class="field-label">Servings</label>
+    <input type="number" id="edit-nr-servings" value="${r.servings||2}" min="1" style="width:80px">
+    <label class="field-label">Tags <span style="font-weight:400;color:var(--faint)">(comma-separated)</span></label>
+    <input type="text" id="edit-nr-tags" value="${(r.tags||[]).join(', ')}">
+    <label class="field-label">Ingredients</label>
+    <div id="edit-nr-ings">${ingRows}</div>
+    <button class="add-ing-btn" onclick="addEditIngRow()">+ add ingredient</button>
+    <label class="field-label">Method</label>
+    <textarea id="edit-nr-method">${r.instructions||''}</textarea>
+    <button class="save-btn" onclick="saveEditRecipe(${id})">Save Changes</button>
+    <div style="height:4px"></div>`;
+  openModal('Edit: '+r.name, body);
+  window._editIngCount=(r.ingredients||[]).length;
+}
+
+function addEditIngRow(){
+  const c=window._editIngCount++;
+  const d=document.createElement("div");d.className="ing-row";
+  d.innerHTML='<input type="text" placeholder="Ingredient" id="edit-ni-item-'+c+'"><input type="text" placeholder="Qty" id="edit-ni-qty-'+c+'">';
+  document.getElementById("edit-nr-ings").appendChild(d);
+}
+
+function saveEditRecipe(id){
+  const r=getRecipe(id);if(!r)return;
+  const name=document.getElementById("edit-nr-name").value.trim();
+  if(!name){alert("Please enter a name");return;}
+  r.name=name;
+  r.category=document.getElementById("edit-nr-cat").value;
+  r.servings=parseInt(document.getElementById("edit-nr-servings").value)||2;
+  r.tags=document.getElementById("edit-nr-tags").value.split(",").map(t=>t.trim()).filter(Boolean);
+  r.instructions=document.getElementById("edit-nr-method").value.trim();
+  const ingredients=[];
+  for(let i=0;i<window._editIngCount;i++){
+    const itemEl=document.getElementById("edit-ni-item-"+i);
+    const qtyEl=document.getElementById("edit-ni-qty-"+i);
+    if(itemEl&&itemEl.value.trim())ingredients.push({item:itemEl.value.trim(),qty:(qtyEl?qtyEl.value.trim():"")});
+  }
+  r.ingredients=ingredients;
+  save();closeModal();renderRecipes();
+}
+
 function renderShopping(){
   const fw=document.getElementById("fab-wrap");if(fw)fw.style.display="none";
   const sw=state.shopWeeks;
   let html='<div class="week-tabs" style="margin-bottom:16px">'+[1,2].map(w=>'<button class="week-tab '+(sw.includes(w)?"active":"")+'" onclick="toggleShopWeek('+w+')">Week '+w+'</button>').join("")+'<span class="week-hint">'+(sw.length===2?"Both weeks":sw.length===1?"Week "+sw[0]+" only":"None")+'</span></div>';
   html+='<div class="extra-add-row"><input type="text" id="extra-item-input" placeholder="Add extra item..." onkeydown="if(event.key===\'Enter\')addExtraItem()"><button onclick="addExtraItem()">+</button></div>';
+  // Normalise ingredient names to group similar ones (e.g. "cucumber" / "cucumbers")
+  function normaliseItem(name){
+    return name.toLowerCase().trim()
+      .replace(/^(fresh|dried|frozen|chopped|sliced|diced|minced|grated|large|small|medium)\s+/,'')
+      .replace(/ies$/,'y').replace(/ves$/,'f').replace(/s$/,'');
+  }
+
   const ai={};
-  sw.forEach(w=>{for(let d=0;d<7;d++)for(const m of MEALS){if(state.eatingOut[w+"-"+d])continue;const rid=state.plan[w+"-"+d+"-"+m];if(rid){const r=getRecipe(rid);if(r)r.ingredients.forEach(({item,qty})=>{const a=getAisle(item);if(!ai[a])ai[a]=[];const ex=ai[a].find(x=>x.item.toLowerCase()===item.toLowerCase());if(ex)ex.uses.push({qty,meal:r.name});else ai[a].push({item,uses:[{qty,meal:r.name}]});});}}});
+  sw.forEach(w=>{for(let d=0;d<7;d++)for(const m of MEALS){if(state.eatingOut[w+"-"+d])continue;const rid=state.plan[w+"-"+d+"-"+m];if(rid){const r=getRecipe(rid);if(r)r.ingredients.forEach(({item,qty})=>{const a=getAisle(item);if(!ai[a])ai[a]=[];const norm=normaliseItem(item);const ex=ai[a].find(x=>normaliseItem(x.item)===norm);if(ex){ex.uses.push({qty,meal:r.name});}else{ai[a].push({item,uses:[{qty,meal:r.name}]});}});}}});
   if(state.extraShopItems&&state.extraShopItems.length){if(!ai["Extra"])ai["Extra"]=[];state.extraShopItems.forEach(ei=>ai["Extra"].push({item:ei,uses:[],isExtra:true}));}
   const order=["Produce","Meat & Fish","Dairy & Eggs","Bakery","Dry & Tins","Sauces & Oils","Spices","Frozen","Extra","Other"];
   const hasItems=Object.values(ai).some(a=>a.length>0);
@@ -391,18 +454,29 @@ function renderShopping(){
       items.forEach(({item,uses,isExtra})=>{
         const ck=!!state.checked[item];const inP=state.pantry.some(p=>p.item.toLowerCase()===item.toLowerCase());const inF=state.freezer.some(f=>f.name.toLowerCase().includes(item.toLowerCase())&&f.portions>0);
         const sid=item.replace(/[^a-z0-9]/gi,"_");
-        html+='<div class="shop-item '+(ck?"checked":"")+'" id="si-'+sid+'"><input type="checkbox" '+(ck?"checked":"")+ ' onchange="toggleCheck(\''+item.replace(/'/g,"\\'")+"',this.checked)\"><div style=\"flex:1\"><div class=\"shop-name\">"+item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+"</div>"+(!isExtra&&uses.length?'<div class="shop-meta">'+uses.map(u=>u.qty+" for <em>"+u.meal+"</em>").join(" \u00b7 ")+"</div>":"")+"</div>"+(isExtra?'<button onclick="removeExtraItem(\''+item.replace(/'/g,"\\'")+"')\"+style=\"background:none;border:none;cursor:pointer;font-size:16px;color:#ccc\">&#10005;</button>":"")+"</div>";
+        html+='<div class="shop-item" id="si-'+sid+'" style="'+(ck?"display:none":"display:flex")+'"><input type="checkbox" '+(ck?"checked":"")+ ' onchange="toggleCheck(\''+item.replace(/'/g,"\\'")+"',this.checked)\"><div style=\"flex:1\"><div class=\"shop-name\">"+item+(inP?'<span class="pantry-badge">In pantry</span>':"")+(inF?'<span class="freezer-badge">In freezer</span>':"")+"</div>"+(!isExtra&&uses.length?'<div class="shop-meta">'+uses.map(u=>u.qty+" for <em>"+u.meal+"</em>").join(" \u00b7 ")+"</div>":"")+"</div>"+(isExtra?'<button onclick="removeExtraItem(\''+item.replace(/'/g,"\\'")+"')\" style=\"background:none;border:none;cursor:pointer;font-size:16px;color:#ccc\">&#10005;</button>":"")+"</div>";
       });
       html+='</div>';
     });
-    html+='<button onclick="clearChecked()" style="background:none;border:none;color:var(--faint);font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;font-style:italic">Clear ticked items</button>';
+    const count=Object.keys(state.checked).length;
+    html+='<button id="clear-checked-btn" onclick="clearChecked()" style="background:none;border:none;color:var(--faint);font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;font-style:italic">'+(count>0?"Clear ticked items ("+count+")":"Clear ticked items")+'</button>';
   }
   document.getElementById("view-shopping").innerHTML=html;
 }
 function addExtraItem(){const i=document.getElementById("extra-item-input");if(!i)return;const v=i.value.trim();if(!v)return;if(!state.extraShopItems)state.extraShopItems=[];state.extraShopItems.push(v);i.value="";save();renderShopping();}
 function removeExtraItem(item){state.extraShopItems=state.extraShopItems.filter(x=>x!==item);save();renderShopping();}
 function toggleShopWeek(w){const ws=state.shopWeeks;state.shopWeeks=ws.includes(w)?ws.filter(x=>x!==w):[...ws,w];save();renderShopping();}
-function toggleCheck(item,val){if(val)state.checked[item]=true;else delete state.checked[item];save();const sid=item.replace(/[^a-z0-9]/gi,"_");const el=document.getElementById("si-"+sid);if(el)el.classList.toggle("checked",val);}
+function toggleCheck(item,val){
+  if(val)state.checked[item]=true;else delete state.checked[item];
+  save();
+  const sid=item.replace(/[^a-z0-9]/gi,"_");
+  const el=document.getElementById("si-"+sid);
+  if(el)el.style.display=val?"none":"flex";
+  // update the clear button count
+  const count=Object.keys(state.checked).length;
+  const clearBtn=document.getElementById("clear-checked-btn");
+  if(clearBtn)clearBtn.textContent=count>0?"Clear ticked items ("+count+")":"Clear ticked items";
+}
 function clearChecked(){state.checked={};save();renderShopping();}
 
 function renderFreezer(){
@@ -441,17 +515,62 @@ function closeModal(e){if(e&&e.target!==document.getElementById("modal"))return;
 function openAssign(cell,meal,dayName){
   const w=cell.split("-")[0];
   let body='<p style="font-size:13px;color:var(--faint);font-style:italic;margin-bottom:14px">'+meal+" \u00b7 "+dayName+" \u00b7 Week "+w+'</p>';
+
+  // Freezer section
+  const availFreezer=state.freezer.filter(f=>f.portions>0);
+  if(availFreezer.length){
+    body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">&#129482; From Freezer</div>';
+    availFreezer.forEach((f,i)=>{
+      const realIdx=state.freezer.indexOf(f);
+      body+='<button class="assign-btn" style="border-color:#90caf9;background:#f0f8ff" onclick="assignFreezerMeal(\''+cell+'\','+realIdx+')"><div class="assign-name" style="color:#1565c0">'+f.name+'</div><div style="font-size:12px;color:#5c9ab5;margin-top:2px">'+f.portions+' portion'+(f.portions!==1?"s":"")+(f.date?" \u00b7 frozen "+f.date:"")+'</div></button>';
+    });
+    body+='<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 8px">&#127859; From Recipes</div>';
+  }
+
   const matching=state.recipes.filter(r=>(r.category||"")===meal);
   const others=state.recipes.filter(r=>(r.category||"")!==meal);
   const ordered=[...matching,...others];
-  if(!ordered.length)body+='<div class="empty-state">No recipes yet!</div>';
+  if(!ordered.length&&!availFreezer.length)body+='<div class="empty-state">No recipes yet!</div>';
   ordered.forEach(r=>{
+    const tags=r.tags||[];
     const isMatch=(r.category||"")===meal;
-    body+='<button class="assign-btn" onclick="assignRecipe(\''+cell+'\','+r.id+')"><div class="assign-name">'+r.name+(!isMatch?' <span style="font-size:10px;color:var(--faint)">('+( r.category||"Other")+")</span>":"")+'</div><div class="tags-row">'+r.tags.map(tagChip).join("")+'</div></button>';
+    body+='<button class="assign-btn" onclick="assignRecipe(\''+cell+'\','+r.id+')"><div class="assign-name">'+r.name+(!isMatch?' <span style="font-size:10px;color:var(--faint)">('+( r.category||"Other")+")</span>":"")+'</div><div class="tags-row">'+tags.map(tagChip).join("")+'</div></button>';
   });
   openModal("Choose a recipe",body);
 }
-function assignRecipe(cell,rid){state.plan[cell]=rid;save();closeModal();renderPlanner();}
+
+function assignFreezerMeal(cell,freezerIdx){
+  if(!state.freezerPlan)state.freezerPlan={};
+  // clear any recipe assignment
+  state.plan[cell]=null;
+  // store freezer assignment
+  state.freezerPlan[cell]=freezerIdx;
+  // deduct a portion
+  if(state.freezer[freezerIdx]){
+    state.freezer[freezerIdx].portions=Math.max(0,state.freezer[freezerIdx].portions-1);
+  }
+  save();closeModal();renderPlanner();
+}
+
+function clearCell(cell){
+  // if it was a freezer meal, restore the portion
+  if(state.freezerPlan&&state.freezerPlan[cell]!==undefined){
+    const idx=state.freezerPlan[cell];
+    if(state.freezer[idx])state.freezer[idx].portions++;
+    delete state.freezerPlan[cell];
+  }
+  state.plan[cell]=null;save();renderPlanner();
+}
+
+function assignRecipe(cell,rid){
+  // clear any existing freezer assignment for this cell
+  if(state.freezerPlan&&state.freezerPlan[cell]!==undefined){
+    const idx=state.freezerPlan[cell];
+    if(state.freezer[idx])state.freezer[idx].portions++;
+    delete state.freezerPlan[cell];
+  }
+  state.plan[cell]=rid;save();closeModal();renderPlanner();
+}
 
 let newIngCount=1;
 function openNewRecipe(){
@@ -488,8 +607,8 @@ function confirmImport(){if(!parsedImport)return;state.recipes.push({id:Date.now
 
 const APPS_SCRIPT_CODE="function doGet(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  var data = sheet.getRange(\"A1\").getValue();\n  return ContentService.createTextOutput(data || \"{}\").setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction doPost(e) {\n  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"data\") \n              || SpreadsheetApp.getActiveSpreadsheet().insertSheet(\"data\");\n  sheet.getRange(\"A1\").setValue(e.postData.contents);\n  return ContentService.createTextOutput(\"ok\").setMimeType(ContentService.MimeType.TEXT);\n}";
 function updateSyncDot(s,l){const d=document.getElementById("sync-dot");const lb=document.getElementById("sync-label");if(!d)return;d.className="sync-dot "+s;if(lb)lb.textContent=l;}
-async function syncToSheet(){if(!state.syncUrl)return;updateSyncDot("syncing","syncing...");try{await fetch(state.syncUrl,{method:"POST",body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,freezer:state.freezer,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems,checked:state.checked}),headers:{"Content-Type":"text/plain"}});updateSyncDot("ok","synced");}catch{updateSyncDot("err","sync failed");}}
-async function loadFromSheet(){if(!state.syncUrl)return false;updateSyncDot("syncing","loading...");try{const res=await fetch(state.syncUrl+"?t="+Date.now());const text=await res.text();if(!text||text==="{}"){{updateSyncDot("ok","synced");return false;}}const data=JSON.parse(text);["plan","recipes","pantry","freezer","eatingOut","extraShopItems","checked"].forEach(k=>{if(data[k]!==undefined)state[k]=data[k];});try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}updateSyncDot("ok","synced");return true;}catch{updateSyncDot("err","load failed");return false;}}
+async function syncToSheet(){if(!state.syncUrl)return;updateSyncDot("syncing","syncing...");try{await fetch(state.syncUrl,{method:"POST",body:JSON.stringify({plan:state.plan,recipes:state.recipes,pantry:state.pantry,freezer:state.freezer,freezerPlan:state.freezerPlan,eatingOut:state.eatingOut,extraShopItems:state.extraShopItems,checked:state.checked}),headers:{"Content-Type":"text/plain"}});updateSyncDot("ok","synced");}catch{updateSyncDot("err","sync failed");}}
+async function loadFromSheet(){if(!state.syncUrl)return false;updateSyncDot("syncing","loading...");try{const res=await fetch(state.syncUrl+"?t="+Date.now());const text=await res.text();if(!text||text==="{}"){{updateSyncDot("ok","synced");return false;}}const data=JSON.parse(text);["plan","recipes","pantry","freezer","freezerPlan","eatingOut","extraShopItems","checked"].forEach(k=>{if(data[k]!==undefined)state[k]=data[k];});if(!state.freezerPlan)state.freezerPlan={};try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}updateSyncDot("ok","synced");return true;}catch{updateSyncDot("err","load failed");return false;}}
 async function testAndConnect(){const input=document.getElementById("sync-url-input");if(!input)return;const url=input.value.trim();if(!url.startsWith("https://script.google.com")){showSettingsStatus("err","Doesn't look like a Google Apps Script URL.");return;}state.syncUrl=url;try{localStorage.setItem("deux-semaines-v4",JSON.stringify(state));}catch(e){}showSettingsStatus("ok","Testing...");await loadFromSheet();showSettingsStatus("ok","Connected!");renderPlanner();renderRecipes();}
 async function manualSync(){const btn=document.getElementById("sync-now-btn");if(btn)btn.disabled=true;await loadFromSheet();await syncToSheet();if(btn)btn.disabled=false;renderPlanner();renderRecipes();renderShopping();renderFreezer();renderPantry();showSettingsStatus("ok","Synced!");}
 function showSettingsStatus(type,msg){const b=document.getElementById("settings-status");if(!b)return;b.className="status-box "+type;b.style.display="block";b.textContent=msg;}
